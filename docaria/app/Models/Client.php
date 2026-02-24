@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ClientModel extends Model
+class Client extends Model
 {
     //
 
@@ -12,8 +12,8 @@ class ClientModel extends Model
     protected $table = 'clients';
 
     protected $fillable = [
-    'id',
-    'id_faturacao',
+    // 'id',
+    // 'id_faturacao',
     'name',
     'nif',
     'contact',
