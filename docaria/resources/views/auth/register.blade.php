@@ -18,12 +18,11 @@
             <div class="row vh-100">
                 <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
                     <div class="d-table-cell align-middle">
-                        <div class="text-center mt-4">
-                            <h1 class="h2">Registar nova conta</h1>
-                        </div>
-
                         <div class="card shadow-sm">
                             <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <img src="{{ asset('assets/logo_png.png') }}" alt="Logo A Docaria" class="auth-logo">
+                                </div>
                                 <div class="m-sm-3">
                                     <form method="post" action="{{ route('register.store') }}" autocomplete="off">
                                         @csrf

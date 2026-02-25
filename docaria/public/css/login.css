@@ -24,6 +24,22 @@ body {
     background-repeat: no-repeat;
 }
 
+main.d-flex.w-100 {
+    min-height: 100vh;
+    padding: clamp(14px, 2.5vw, 28px);
+}
+
+main.d-flex.w-100 .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+main.d-flex.w-100 .row.vh-100 {
+    width: 100%;
+    min-height: calc(100vh - clamp(28px, 5vw, 56px));
+}
+
 .login-page {
     min-height: 100vh;
     display: flex;
@@ -152,10 +168,24 @@ h1.h2 {
     font-size: 2rem;
 }
 
-.card {
-    border-radius: 10px;
-    background-color: var(--paper);
-    border: 1px solid #e2dbd2;
+.auth-logo {
+    width: clamp(120px, 22vw, 190px);
+    height: auto;
+    display: inline-block;
+}
+
+.card,
+.card.shadow-sm {
+    border-radius: 20px;
+    --bs-card-bg: var(--ink);
+    background-color: var(--ink);
+    border: 1px solid #28445c;
+}
+
+.card .card-body {
+    background-color: var(--ink);
+    color: #eef3f7;
+    border-radius: 20px;
 }
 
 .card-body {
@@ -169,6 +199,7 @@ h1.h2 {
 .form-label {
     font-size: 0.95rem;
     margin-bottom: 0.4rem;
+    color: #eef3f7;
 }
 
 .form-control.form-control-lg {
@@ -199,6 +230,7 @@ h1.h2 {
 .form-check-label,
 .text-small {
     font-size: 0.9rem;
+    color: #eef3f7;
 }
 
 .btn.btn-lg {
@@ -210,7 +242,8 @@ h1.h2 {
 .btn-login-submit {
     background-color: #d9c1a2;
     border-color: #d9c1a2;
-    color: #3f3226;
+    color: var(--ink);
+    font-weight: 700;
 }
 
 .btn-login-submit:hover,
@@ -218,7 +251,7 @@ h1.h2 {
 .btn-login-submit:active {
     background-color: #c9ad8b;
     border-color: #c9ad8b;
-    color: #3f3226;
+    color: var(--ink);
 }
 
 .auth-link-primary {
@@ -325,7 +358,7 @@ h1.h2 {
     }
 
     .card {
-        border-radius: 8px;
+        border-radius: 16px;
     }
 
     .card-body {
