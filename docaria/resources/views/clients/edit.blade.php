@@ -15,7 +15,7 @@
 
 	<div class="mb-3">
         <label for="nif" class="form-label">Nif do cliente</label>
-        <input required name="nif" type="text" class="form-control" id="nif" value="{{ $client->nif }}">
+        <input  name="nif" type="text" class="form-control" id="nif" value="{{ $client->nif }}">
         @error('nif')
             <p class="text-danger">Erro no nif do cliente</p>
         @enderror
@@ -23,7 +23,7 @@
 
 	<div class="mb-3">
         <label for="contact" class="form-label">Contacto do cliente</label>
-        <input required name="contact" type="text" class="form-control" id="contact" value="{{ $client->contact }}">
+        <input  name="contact" type="text" class="form-control" id="contact" value="{{ $client->contact }}">
         @error('contact')
             <p class="text-danger">Erro no contacto do cliente</p>
         @enderror
@@ -31,7 +31,7 @@
 
 	<div class="mb-3">
         <label for="address" class="form-label">Morada do cliente</label>
-        <input required name="address" type="text" class="form-control" id="address" value="{{ $client->address }}">
+        <input  name="address" type="text" class="form-control" id="address" value="{{ $client->address }}">
         @error('address')
             <p class="text-danger">Erro na morada do cliente</p>
         @enderror

@@ -6,6 +6,7 @@ use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UserController;
 
 // Rota pública (login)
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Clientes (assumindo que vais criar depois)
     Route::resource('clients', ClientController::class);
+
+    Route::resource('users', UserController::class);
+
+
 });
 
 // Rota de logout
@@ -35,6 +40,8 @@ Route::get('/logout', function () {
     Auth::logout();
     return redirect()->route('login');
 })->name('logout');
+
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');

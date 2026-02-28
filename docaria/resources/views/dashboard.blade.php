@@ -51,6 +51,18 @@
                             </div>
                         </div>
                     </div>
+
+                     <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i data-feather="users" class="feather-lg text-info mb-2"></i>
+                                <h5>Utilizadores</h5>
+                                <a href="{{ route('users.index') }}" class="btn btn-info btn-sm mt-2">
+                                    Ver Utilizadores
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

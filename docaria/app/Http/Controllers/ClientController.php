@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Client;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB; 
 
 
@@ -21,6 +22,7 @@ class ClientController extends Controller
 
     }
 
+
     public function store(Request $request){
 $request->validate([
     'name' => 'required|string|max:50',
@@ -34,14 +36,36 @@ DB::table('clients')->insert([
     'contact' => $request->input('contact'),
 ]);
 
-return redirect()->route('clients.index')->with('success', 'Client created successfully');
+return redirect()->route('clients.index')->with('success', 'Cliente criado com sucesso');
     }
 
-    public function index(){
-        $clients = Client::paginate(10);
-        return view('clients.index', compact('clients'));
+
+
+    public function index(Request $request)
+{
+    $query = Client::withCount('orders')
+        ->withMax('orders', 'order_date');
+
+    // filtro simples
+    if ($request->search) {
+
+        $query->where(function($q) use ($request) {
+
+            $q->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('contact', 'like', '%' . $request->search . '%')
+              ->orWhere('nif', 'like', '%' . $request->search . '%')
+                ->orWhere('address', 'like', '%' . $request->search . '%');
+
+        });
 
     }
+
+    $clients = $query->paginate(10);
+
+    return view('clients.index', compact('clients'));
+}
+
+
 
     public function update(Request $request, $id){
 
@@ -50,25 +74,31 @@ return redirect()->route('clients.index')->with('success', 'Client created succe
     'nif' => 'nullable|string|max:20',
     'contact' => 'nullable|string|max:20',
     'address' => 'nullable|string|max:255',
-]);
+    ]);
 
-$client = Client::findorFail($id);
-$client->name = $request->input('name');
-$client->nif = $request->input('nif');
-$client->contact = $request->input('contact');
-$client->address = $request->input('address');
-$client->save();
+  $client = Client::findorFail($id);
+  $client->name = $request->input('name');
+  $client->nif = $request->input('nif');
+  $client->contact = $request->input('contact');
+  $client->address = $request->input('address');
+  $client->save();
+
+  return redirect()->route('clients.index')->with('success', 'Cliente actualizado com sucesso');
     }
+
+
 
     public function destroy($id){
 
     $client = Client::findorFail($id);
     $client->delete();
-    return redirect()->route('clients.index')->with('success', 'Client deleted successfully');
+    return redirect()->route('clients.index')->with('success', 'Cliente eliminado com sucesso');
     }
 
     public function show($id){
-        $client = Client::findorFail($id);
+        $client = Client::withCount('orders')
+        ->withMax('orders', 'order_date')
+        ->findOrFail($id);
         return view('clients.ver_cliente_id', compact('client'));
 
     }

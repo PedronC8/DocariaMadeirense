@@ -20,9 +20,9 @@
  
       <tr>
         <td>{{ $client->name }}</td>
-        <td>{{ $client->contact }}</td>
-        <td>{{ $client->last_order }}</td>
-        <td>{{ $client->total_orders }}</td>
+        <td>{{ $client->contact ? $client->contact : '---' }}</td>
+        <td>{{ $client->orders_max_order_date ? $client->orders_max_order_date : '---' }}</td>
+        <td>{{ $client->orders_count }}</td>
         
         
         <td>

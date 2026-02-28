@@ -77,6 +77,15 @@
                             <span class="align-middle">Clientes</span>
                         </a>
                     </li>
+
+
+                    <!-- Utilizadores -->
+                    <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ route('users.index') }}">
+                            <i class="align-middle" data-feather="users"></i> 
+                            <span class="align-middle">Utilizadores</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
