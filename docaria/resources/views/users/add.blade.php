@@ -1,6 +1,16 @@
 @extends('layouts.app')
 @section('content')
 
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h1><strong>Novo Utilizador</strong></h1>
+    </div>
+
+    <div class="col-auto ms-auto text-end mt-n1">
+         <a href="{{ route('users.index') }}" class="btn btn-primary">Voltar atrás</a>
+    </div>
+</div>
+
 
 		   <!-- Formulário de adicionar cliente -->
 <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
@@ -11,6 +21,14 @@
         <input required name="name" type="text" class="form-control" id="username" >
         @error('username')
             <p class="text-danger">Erro no nome do utilizador</p>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label for="role" class="form-label">Tipo de utilizador</label>
+        <input  name="role" type="text" class="form-control" id="email" >
+        @error('email')
+            <p class="text-danger">Erro no tipo de utilizador</p>
         @enderror
     </div>
 

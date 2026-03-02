@@ -33,7 +33,9 @@ $request->validate([
 
 DB::table('clients')->insert([
     'name' => $request->input('name'),
+    'nif' => $request->input('nif'),
     'contact' => $request->input('contact'),
+    'address' => $request->input('address')
 ]);
 
 return redirect()->route('clients.index')->with('success', 'Cliente criado com sucesso');
@@ -102,4 +104,6 @@ return redirect()->route('clients.index')->with('success', 'Cliente criado com s
         return view('clients.ver_cliente_id', compact('client'));
 
     }
+
+   
 }

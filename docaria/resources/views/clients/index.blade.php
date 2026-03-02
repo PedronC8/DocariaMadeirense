@@ -36,15 +36,7 @@
                 placeholder="Pesquisar por nome, telefone..."
             >
 
-            <!-- FUTURO FILTRO VENDEDOR -->
-            <!-- <select name="seller" class="form-select" style="width:180px;">
-                <option value="">Vend: Todos</option>
-            </select> -->
-
-            <!-- FUTURO FILTRO DATA -->
-            <!-- <select name="date" class="form-select" style="width:180px;">
-                <option value="">Data: Todas</option>
-            </select> -->
+            
 
             <!-- div para botões, empurrando para a direita -->
             <div class="ms-auto d-flex gap-2">
@@ -81,9 +73,9 @@
 
         <th style="width:15%;">Telefone</th>
 
-        <th style="width:20%;">Última Encomenda</th>
+        <th style="width:20%;">Nif</th>
 
-        <th style="width:15%;">Total Encomendas</th>
+        <th style="width:15%;">Morada</th>
 
         <th class="text-end pe-4" style="width:15%;">Ações</th>
     </tr>
@@ -104,11 +96,15 @@
                     </td>
 
                     <td > 
-                        {{ $client->orders_max_order_date ? $client->orders_max_order_date : '---' }}
+                        {{ $client->nif ? $client->nif : '---' }}
                     </td>
 
                     <td> 
-                        {{ $client->orders_count }}
+                        {{ $client->address ?
+                         (Str::length($client->address)>10 
+                          ? Str::limit($client->address,10) : $client->address)
+                        
+                         : '---' }}
                     </td>
 
                     <td class="text-end ">

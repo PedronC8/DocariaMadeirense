@@ -8,11 +8,11 @@
 
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h1><strong>Utilizadores</strong></h1>
+        <h1><strong>Gestão de utilizadores</strong></h1>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
-         <a href="{{ route('clients.create') }}" class="btn btn-primary"><i class="align-middle me-2 " data-feather="plus"></i>Novo Cliente</a>
+         <a href="{{ route('users.create') }}" class="btn btn-primary"><i class="align-middle me-2 " data-feather="plus"></i>Novo Utilizador</a>
     </div>
 </div>
 
@@ -37,7 +37,7 @@
 
         <th style="width:15%;">Email</th>
 
-        <th style="width:20%;">Data de criação</th>
+        <th style="width:20%;">Tipo de utilizador</th>
 
         <th style="width:15%;">Password</th>
 
@@ -60,7 +60,7 @@
                     </td>
 
                     <td > 
-                        {{ $user->created_at ? $user->created_at->format('d/m/Y') : '---' }}
+                        {{ $user->role }}
                     </td>
 
                     <td > 

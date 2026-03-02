@@ -30,7 +30,9 @@ $request->validate([
 
 DB::table('users')->insert([
     'name' => $request->input('name'),
-    'contact' => $request->input('contact'),
+    'role' => $request->input('role'),
+    'email' => $request->input('email'),
+    'password' => $request->input('password')
 ]);
 
 return redirect()->route('users.index')->with('success', 'Utilizador criado com sucesso');
@@ -52,6 +54,7 @@ return redirect()->route('users.index')->with('success', 'Utilizador criado com 
 
     $request->validate([
     'name' => 'sometimes|required|string|max:50',
+    'role' => 'sometimes|required|string|max:50',
     'email' => 'nullable|string|max:20',
     'password' => 'nullable|string|max:20',
     

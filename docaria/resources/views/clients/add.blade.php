@@ -1,6 +1,17 @@
 @extends('layouts.app')
 @section('content')
 
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h1><strong>Novo Cliente</strong></h1>
+    </div>
+
+    <div class="col-auto ms-auto text-end mt-n1">
+         <a href="{{ route('clients.index') }}" class="btn btn-primary">Voltar atrás</a>
+    </div>
+</div>
+
+
 
 		   <!-- Formulário de adicionar cliente -->
 <form method="POST" action="{{ route('clients.store') }}" enctype="multipart/form-data">

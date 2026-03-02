@@ -1,14 +1,28 @@
 @extends('layouts.app')
 @section('content')
 
-<h1>Detalhes do cliente</h1>
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3><strong>{{$user->name}}</strong></h3>
+    </div>
 
-<table class="table">
-  <thead>
+    <div class="col-auto ms-auto text-end mt-n1">
+        <a href="{{ route('users.index') }}" class="btn btn-primary">
+             Voltar atrás
+        </a>
+    </div>
+</div>
+
+<div class="card">
+
+<div class="card-body p-0">
+
+<table class="table table-borderless table-sm mb-0">
+  <thead style="background:#e2e8f0;color:#0f172a;border-bottom:2px solid #cbd5e1;">
     <tr>
       <th>Nome</th>
 		<th>Email</th>
-		<th>Data de Criação</th>
+		<th>Tipo de utilizador</th>
 		<th>Password</th>
     <th>Ações</th>
       
@@ -21,7 +35,7 @@
       <tr>
         <td>{{ $user->name }}</td>
         <td>{{ $user->email}}</td>
-        <td>{{ $user->created_at }}</td>
+        <td>{{ $user->role ? $user->role : '---'}}</td>
         <td>{{ $user->password }}</td>
         
         
@@ -38,4 +52,11 @@
   
   </tbody>
 </table>
+
+
+</div>
+
+</div>
+
+
 @endsection

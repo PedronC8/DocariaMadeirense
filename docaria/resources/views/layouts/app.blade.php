@@ -79,11 +79,11 @@
                     </li>
 
 
-                    <!-- Utilizadores -->
+                    <!-- Administração -->
                     <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ route('users.index') }}">
-                            <i class="align-middle" data-feather="users"></i> 
-                            <span class="align-middle">Utilizadores</span>
+                            <i class="align-middle" data-feather="settings"></i> 
+                            <span class="align-middle">Administração</span>
                         </a>
                     </li>
                 </ul>
