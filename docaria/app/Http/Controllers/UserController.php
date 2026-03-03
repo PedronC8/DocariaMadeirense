@@ -6,18 +6,19 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB; 
 
+
 class UserController extends Controller
 {
-     public function create(){
-        return view('users.add');
+    public function create() {
+    $roles = \App\Models\User::distinct()->pluck('role'); // pega todos os roles únicos
+    return view('users.add', compact('roles'));
+}
 
-    }
-
-    public function edit($id){
-        $user = User::findorFail($id);
-        return view('users.edit', compact('user'));
-
-    }
+    public function edit($id) {
+    $user = \App\Models\User::findOrFail($id);
+    $roles = \App\Models\User::distinct()->pluck('role'); // para preencher o select
+    return view('users.edit', compact('user', 'roles'));
+}
 
 
     public function store(Request $request){

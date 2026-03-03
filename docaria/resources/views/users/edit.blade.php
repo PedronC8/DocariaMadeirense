@@ -26,12 +26,17 @@
     </div>
 
     <div class="mb-3">
-        <label for="role" class="form-label">Tipo de utilizador</label>
-        <input  name="role" type="text" class="form-control" id="email" >
-        @error('email')
-            <p class="text-danger">Erro no tipo de utilizador</p>
-        @enderror
-    </div>
+    <label for="role" class="form-label">Tipo de utilizador</label>
+    <select name="role" id="role" class="form-control">
+        <option value="">Seleciona um tipo</option>
+        @foreach($roles as $role)
+            <option value="{{ $role }}">{{ $role }}</option>
+        @endforeach
+    </select>
+    @error('role')
+        <p class="text-danger">Erro no tipo de utilizador</p>
+    @enderror
+</div>
 
 	<div class="mb-3">
         <label for="email" class="form-label">Email do utilizador</label>
