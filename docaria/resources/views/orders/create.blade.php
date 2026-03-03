@@ -3,6 +3,13 @@
 @section('title', 'Nova Encomenda - A Docaria')
 
 @push('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <style>
     .product-card {
         transition: all 0.3s ease;
@@ -19,34 +26,44 @@
     }
     .product-img {
         width: 100%;
-        height: 120px;
+        height: 100px;
         object-fit: cover;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 2rem;
+        font-size: 1.5rem;
         border-radius: 0.25rem 0.25rem 0 0;
     }
     .quantity-controls {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.3rem;
     }
     .quantity-controls button {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         padding: 0;
-        font-size: 1.2rem;
+        font-size: 1rem;
         line-height: 1;
     }
     .quantity-controls input {
-        width: 60px;
+        width: 50px;
         text-align: center;
+        font-size: 0.875rem;
     }
     .category-tabs .nav-link {
         cursor: pointer;
+    }
+    .subcategory-tabs {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+    }
+    .subcategory-tabs .btn {
+        margin: 0.2rem;
     }
     .summary-card {
         position: sticky;
@@ -58,6 +75,32 @@
     }
     .order-item-row:last-child {
         border-bottom: none;
+    }
+    .product-card .card-body {
+        padding: 0.75rem;
+    }
+    .product-card .card-title {
+        font-size: 0.9rem;
+    }
+    .product-card .text-muted {
+        font-size: 0.75rem;
+    }
+    .product-card .text-primary {
+        font-size: 0.9rem;
+    }
+    /* Esconder setas dos inputs number */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    /* Corrigir altura do Select2 */
+    .select2-container--bootstrap-5 .select2-selection--single {
+        min-height: 33px !important;
+        padding: 0.375rem 0.75rem;
     }
 </style>
 @endpush
@@ -115,42 +158,43 @@
                 </div>
             </div>
 
-            <!-- Card: Datas -->
+            <!-- Card: Datas (Simplificado) -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Datas</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="form-label">Data Encomenda <span class="text-danger">*</span></label>
-                            <input type="date" name="order_date" class="form-control @error('order_date') is-invalid @enderror" 
-                                   value="{{ old('order_date', date('Y-m-d')) }}" required>
+                            <input type="text" 
+                                   id="orderDate" 
+                                   class="form-control datepicker" 
+                                   placeholder="dd/mm/aaaa"
+                                   value="{{ old('order_date') ? \Carbon\Carbon::parse(old('order_date'))->format('d/m/Y') : date('d/m/Y') }}"
+                                   autocomplete="off" 
+                                   required>
+                            <input type="hidden" name="order_date" id="orderDateHidden" value="{{ old('order_date', date('Y-m-d')) }}">
                             @error('order_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Pronto Em <span class="text-danger">*</span></label>
-                            <input type="date" name="ready_date" class="form-control @error('ready_date') is-invalid @enderror" 
-                                   value="{{ old('ready_date') }}" required>
-                            @error('ready_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Data Entrega <span class="text-danger">*</span></label>
-                            <input type="date" name="delivery_date" class="form-control @error('delivery_date') is-invalid @enderror" 
-                                   value="{{ old('delivery_date') }}" required>
-                            @error('delivery_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Data Desejada</label>
-                            <input type="date" name="desired_date" class="form-control" value="{{ old('desired_date') }}">
+                        <div class="col-md-6">
+                            <label class="form-label">Data Entrega Desejada</label>
+                            <input type="text" 
+                                   id="desiredDate" 
+                                   class="form-control datepicker" 
+                                   placeholder="dd/mm/aaaa"
+                                   value="{{ old('desired_date') ? \Carbon\Carbon::parse(old('desired_date'))->format('d/m/Y') : '' }}"
+                                   autocomplete="off">
+                            <input type="hidden" name="desired_date" id="desiredDateHidden" 
+                            value="{{ old('desired_date', date('Y-m-d')) }}">
                         </div>
                     </div>
+                    
+                    <!-- Campos Hidden - preenchidos automaticamente com data atual -->
+                    <input type="hidden" name="ready_date" value="{{ date('Y-m-d') }}">
+                    <input type="hidden" name="delivery_date" value="{{ date('Y-m-d') }}">
                 </div>
             </div>
 
@@ -161,36 +205,41 @@
                 </div>
                 <div class="card-body">
                     <!-- Tabs de Categorias -->
-                    <ul class="nav nav-tabs category-tabs mb-3" role="tablist">
+                    <ul class="nav nav-tabs category-tabs mb-2" role="tablist" id="categoryTabs">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" data-category="all" type="button">Todos</button>
                         </li>
                         @php
-                            $categories = $products->pluck('subcategory.category')->unique('id');
+                            $categories = $products->pluck('subcategory.category')->unique('id')->filter();
                         @endphp
                         @foreach($categories as $category)
-                            @if($category)
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" data-category="{{ $category->id }}" type="button">
-                                        {{ $category->name }}
-                                    </button>
-                                </li>
-                            @endif
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-category="{{ $category->id }}" type="button">
+                                    {{ $category->name }}
+                                </button>
+                            </li>
                         @endforeach
                     </ul>
 
-                    <!-- Grid de Produtos -->
-                    <div class="row g-3" id="productsGrid">
+                    <!-- Subcategorias (aparecem conforme categoria selecionada) -->
+                    <div class="subcategory-tabs" id="subcategoryContainer" style="display: none;">
+                        <small class="text-muted">Subcategoria:</small>
+                        <div id="subcategoryButtons"></div>
+                    </div>
+
+                    <!-- Grid de Produtos (4 por linha) -->
+                    <div class="row g-2 mt-2" id="productsGrid">
                         @foreach($products as $product)
-                            <div class="col-md-4 product-item" data-category="{{ $product->subcategory->category_id ?? '' }}">
+                            <div class="col-md-3 product-item" 
+                                 data-category="{{ $product->subcategory->category_id ?? '' }}"
+                                 data-subcategory="{{ $product->subcategory_id ?? '' }}">
                                 <div class="card product-card h-100" data-product-id="{{ $product->id }}">
                                     <div class="product-img">
                                         <i class="align-middle" data-feather="package"></i>
                                     </div>
                                     <div class="card-body">
                                         <h6 class="card-title mb-1">{{ $product->label }}</h6>
-                                        <p class="text-muted small mb-2">{{ $product->name }}</p>
-                                        <p class="text-primary fw-bold mb-3">{{ $product->formatted_price }}</p>
+                                        <p class="text-muted small mb-4">{{ $product->name }}</p>
                                         
                                         <div class="quantity-controls">
                                             <button type="button" class="btn btn-sm btn-outline-secondary decrease-qty">
@@ -211,53 +260,47 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Sidebar - Informações Adicionais + Resumo -->
+        <div class="col-lg-4">
             <!-- Card: Informações Adicionais -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Informações Adicionais</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Trabalhador Responsável</label>
-                            <select name="trabalhador_id" class="form-select">
-                                <option value="">Nenhum</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select name="status" class="form-select" required>
-                                <option value="preparacao" selected>Em Preparação</option>
-                                <option value="concluido">Concluído</option>
-                                <option value="entregue">Entregue</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Método de Pagamento</label>
-                            <select name="payment_method" class="form-select">
-                                <option value="">Selecione...</option>
-                                <option value="dinheiro">Dinheiro</option>
-                                <option value="cartao">Cartão</option>
-                                <option value="cheque">Cheque</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Notas</label>
-                            <textarea name="notes" class="form-control" rows="3" placeholder="Observações...">{{ old('notes') }}</textarea>
-                        </div>
+                    <!-- Trabalhador responsável HIDDEN - usa o ID do utilizador logado -->
+                    <input type="hidden" name="trabalhador_id" value="{{ Auth::id() }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Estado <span class="text-danger">*</span></label>
+                        <select name="status" class="form-select" required>
+                            <option value="preparacao" selected>Em Preparação</option>
+                            <option value="concluido">Concluído</option>
+                            <option value="entregue">Entregue</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Estado do Pagamento <span class="text-danger">*</span></label>
+                        <select name="payment_status" class="form-select" required>
+                            <option value="nao_pago" selected>Não Pago</option>
+                            <option value="parcial">Parcial</option>
+                            <option value="pago">Pago</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <label class="form-label">Notas</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Observações...">{{ old('notes') }}</textarea>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Sidebar - Resumo da Encomenda -->
-        <div class="col-lg-4">
+            <!-- Card: Resumo da Encomenda -->
             <div class="card summary-card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header text-white" style="background-color: #222e3c;">
                     <h5 class="card-title mb-0 text-white">Resumo da Encomenda</h5>
                 </div>
                 <div class="card-body">
@@ -279,22 +322,13 @@
                         <strong id="subtotal">0,00€</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>IVA (23%):</span>
+                        <span>IVA (22%):</span>
                         <strong id="iva">0,00€</strong>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="mb-0">Total:</h5>
                         <h5 class="mb-0 text-primary" id="total">0,00€</h5>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Estado do Pagamento <span class="text-danger">*</span></label>
-                        <select name="payment_status" class="form-select" required>
-                            <option value="nao_pago" selected>Não Pago</option>
-                            <option value="parcial">Parcial</option>
-                            <option value="pago">Pago</option>
-                        </select>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 btn-lg" id="submitBtn" disabled>
@@ -308,19 +342,85 @@
 @endsection
 
 @push('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let selectedProducts = {};
+    let subcategoriesByCategory = @json($products->groupBy('subcategory.category_id')->map(function($items) {
+        return $items->pluck('subcategory')->unique('id')->filter()->values();
+    }));
+
+    // ========================================
+    // 1. INICIALIZAR SELECT2 (CLIENTE)
+    // ========================================
+    $('#client_id').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Selecione um cliente...',
+        allowClear: true,
+        language: {
+            noResults: function() { return "Nenhum cliente encontrado"; },
+            searching: function() { return "A pesquisar..."; }
+        },
+        minimumInputLength: 0,
+        matcher: function(params, data) {
+            if ($.trim(params.term) === '') return data;
+            if (params.term.length < 1 && data.id !== '') return null;
+            if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) return data;
+            return null;
+        }
+    });
 
     // Atualizar informações do cliente
-    const clientSelect = document.getElementById('client_id');
-    clientSelect.addEventListener('change', function() {
+    $('#client_id').on('change', function() {
         const option = this.options[this.selectedIndex];
         document.getElementById('client_phone').value = option.dataset.phone || '---';
         document.getElementById('client_address').value = option.dataset.address || '---';
     });
 
-    // Filtrar produtos por categoria
+    // ========================================
+    // 2. INICIALIZAR FLATPICKR (DATAS)
+    // ========================================
+    flatpickr("#orderDate", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        defaultDate: "today",
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                const date = selectedDates[0];
+                const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                document.getElementById('orderDateHidden').value = formatted;
+            }
+        }
+    });
+
+    flatpickr("#desiredDate", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        defaultDate: "today",
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                const date = selectedDates[0];
+                const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                document.getElementById('desiredDateHidden').value = formatted;
+            } else {
+                document.getElementById('desiredDateHidden').value = '';
+            }
+        }
+    });
+
+    // ========================================
+    // 3. FILTRAR PRODUTOS POR CATEGORIA
+    // ========================================
     document.querySelectorAll('.category-tabs .nav-link').forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
@@ -328,22 +428,76 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             
             const category = this.dataset.category;
-            document.querySelectorAll('.product-item').forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
             
-            // Reinicializar Feather Icons
-            if (typeof feather !== 'undefined') {
-                feather.replace();
+            if (category !== 'all' && subcategoriesByCategory[category]) {
+                showSubcategories(category);
+            } else {
+                hideSubcategories();
+                filterProducts(category, 'all');
             }
         });
     });
 
-    // Controles de quantidade
+    function showSubcategories(categoryId) {
+        const container = document.getElementById('subcategoryContainer');
+        const buttonsDiv = document.getElementById('subcategoryButtons');
+        
+        container.style.display = 'block';
+        buttonsDiv.innerHTML = '';
+        
+        const allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.className = 'btn btn-sm btn-outline-primary active';
+        allBtn.dataset.subcategory = 'all';
+        allBtn.textContent = 'Todos';
+        buttonsDiv.appendChild(allBtn);
+        
+        if (subcategoriesByCategory[categoryId]) {
+            subcategoriesByCategory[categoryId].forEach(sub => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm btn-outline-primary';
+                btn.dataset.subcategory = sub.id;
+                btn.textContent = sub.name;
+                buttonsDiv.appendChild(btn);
+            });
+        }
+        
+        buttonsDiv.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                buttonsDiv.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterProducts(categoryId, this.dataset.subcategory);
+            });
+        });
+        
+        filterProducts(categoryId, 'all');
+    }
+
+    function hideSubcategories() {
+        document.getElementById('subcategoryContainer').style.display = 'none';
+    }
+
+    function filterProducts(categoryId, subcategoryId) {
+        document.querySelectorAll('.product-item').forEach(item => {
+            const itemCategory = item.dataset.category;
+            const itemSubcategory = item.dataset.subcategory;
+            
+            if (categoryId === 'all') {
+                item.style.display = 'block';
+            } else if (subcategoryId === 'all') {
+                item.style.display = itemCategory === categoryId ? 'block' : 'none';
+            } else {
+                item.style.display = itemSubcategory === subcategoryId ? 'block' : 'none';
+            }
+        });
+        
+        if (typeof feather !== 'undefined') feather.replace();
+    }
+
+    // ========================================
+    // 4. CONTROLES DE QUANTIDADE
+    // ========================================
     document.querySelectorAll('.increase-qty').forEach(btn => {
         btn.addEventListener('click', function() {
             const input = this.parentElement.querySelector('.product-qty');
@@ -362,7 +516,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Atualizar ao mudar quantidade
     document.querySelectorAll('.product-qty').forEach(input => {
         input.addEventListener('change', function() {
             const productId = this.dataset.productId;
@@ -388,6 +541,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ========================================
+    // 5. ATUALIZAR RESUMO
+    // ========================================
     function updateSummary() {
         const orderItems = document.getElementById('orderItems');
         const orderSummary = document.getElementById('orderSummary');
@@ -436,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         orderItems.innerHTML = html;
 
-        const iva = subtotal * 0.23;
+        const iva = subtotal * 0.22;  // 22% IVA Madeira
         const total = subtotal + iva;
 
         document.getElementById('subtotal').textContent = subtotal.toFixed(2).replace('.', ',') + '€';
@@ -445,9 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Inicializar Feather Icons
-    if (typeof feather !== 'undefined') {
-        feather.replace();
-    }
+    if (typeof feather !== 'undefined') feather.replace();
 });
 </script>
 @endpush

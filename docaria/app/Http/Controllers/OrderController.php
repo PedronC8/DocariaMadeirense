@@ -19,9 +19,16 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = Order::with(['client', 'vendedor', 'trabalhador'])
-        ->orderBy('order_date', 'desc'); 
+            ->orderBy('order_date', 'desc');
 
-        // Filtros
+        // Filtro padrão: mostrar apenas encomendas em preparação
+        // A menos que outros filtros sejam aplicados
+        if (!$request->hasAny(['search', 'payment_status', 'client_id', 'date_from', 'date_to']) 
+            && !$request->has('status')) {
+            $query->status('preparacao');
+        }
+
+        // Filtros aplicados pelo utilizador
         if ($request->filled('status')) {
             $query->status($request->status);
         }
@@ -34,6 +41,7 @@ class OrderController extends Controller
             $query->client($request->client_id);
         }
 
+        // Filtro de pesquisa
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -42,6 +50,15 @@ class OrderController extends Controller
                       $q->where('name', 'like', "%{$search}%");
                   });
             });
+        }
+
+        // Filtro de range de datas (baseado na data de encomenda)
+        if ($request->filled('date_from')) {
+            $query->whereDate('order_date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('order_date', '<=', $request->date_to);
         }
 
         $orders = $query->paginate(15);
@@ -72,6 +89,7 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
+            'invoice' => 'nullable|string|max:255',  // ← ADICIONADO
             'order_date' => 'required|date',
             'ready_date' => 'required|date|after_or_equal:order_date',
             'delivery_date' => 'required|date|after_or_equal:ready_date',
@@ -103,7 +121,8 @@ class OrderController extends Controller
             $order = Order::create([
                 'client_id' => $validated['client_id'],
                 'vendedor_id' => Auth::id(),
-                'trabalhador_id' => $validated['trabalhador_id'],
+                'trabalhador_id' => $validated['trabalhador_id'] ?? null,
+                'invoice' => $validated['invoice'] ?? null,  // ← ADICIONADO
                 'order_date' => $validated['order_date'],
                 'ready_date' => $validated['ready_date'],
                 'delivery_date' => $validated['delivery_date'],
@@ -113,7 +132,7 @@ class OrderController extends Controller
                 'total' => $total,
                 'status' => $validated['status'],
                 'payment_status' => $validated['payment_status'],
-                'payment_method' => $validated['payment_method'],
+                'payment_method' => $validated['payment_method'] ?? null,
                 'notes' => $validated['notes'],
             ]);
 
@@ -174,6 +193,7 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
+            'invoice' => 'nullable|string|max:255',  // ← ADICIONADO
             'order_date' => 'required|date',
             'ready_date' => 'required|date|after_or_equal:order_date',
             'delivery_date' => 'required|date|after_or_equal:ready_date',
@@ -204,7 +224,8 @@ class OrderController extends Controller
             // Atualizar encomenda
             $order->update([
                 'client_id' => $validated['client_id'],
-                'trabalhador_id' => $validated['trabalhador_id'],
+                'trabalhador_id' => $validated['trabalhador_id'] ?? null,
+                'invoice' => $validated['invoice'] ?? null,  // ← ADICIONADO
                 'order_date' => $validated['order_date'],
                 'ready_date' => $validated['ready_date'],
                 'delivery_date' => $validated['delivery_date'],
@@ -214,7 +235,7 @@ class OrderController extends Controller
                 'total' => $total,
                 'status' => $validated['status'],
                 'payment_status' => $validated['payment_status'],
-                'payment_method' => $validated['payment_method'],
+                'payment_method' => $validated['payment_method'] ?? null,
                 'notes' => $validated['notes'],
             ]);
 

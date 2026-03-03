@@ -190,6 +190,34 @@
     feather.replace()
 </script>
 
+<!-- CÓDIGO DO SIDEBAR TOGGLE -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Feather Icons
+    feather.replace();
+
+    // Toggle da Sidebar
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+
+    // Auto-fechar no mobile
+    if (window.innerWidth < 992) {
+        document.addEventListener('click', function(e) {
+            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                sidebar.classList.add('collapsed');
+            }
+        });
+    }
+});
+</script>
+
 
 
     
