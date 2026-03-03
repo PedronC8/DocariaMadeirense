@@ -78,6 +78,14 @@
                         </a>
                     </li>
 
+                    <!-- Estatísticas -->
+                    <li class="sidebar-item {{ request()->routeIs('statistics') ? 'active' : '' }}">
+                        <a class="sidebar-link" href="{{ route('statistics') }}">
+                            <i class="align-middle" data-feather="bar-chart-2"></i>
+                            <span class="align-middle">Estatísticas</span>
+                        </a>
+                    </li>
+
 
                     <!-- Administração -->
                     <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
