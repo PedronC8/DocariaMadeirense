@@ -8,7 +8,7 @@
 
     <div class="col-auto ms-auto text-end mt-n1">
         <a href="{{ route('users.index') }}" class="btn btn-primary">
-             Voltar atrás
+             Voltar 
         </a>
     </div>
 </div>
@@ -40,11 +40,11 @@
         
         
         <td>
-          <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning ">Editar</a>
+          <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning "> <i class="align-middle" data-feather="edit"></i></a>
           <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger">Remover</button>
+            <button type="submit" class="btn btn-danger"><i class="align-middle" data-feather="trash-2"></i></button>
           </form>
         </td>
         

@@ -7,7 +7,7 @@
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
-         <a href="{{ route('clients.index') }}" class="btn btn-primary">Voltar atrás</a>
+         <a href="{{ route('clients.index') }}" class="btn btn-primary">Voltar </a>
     </div>
 </div>
 

@@ -18,6 +18,7 @@ class Product extends Model
         'subcategory_id',
         'price',
         'active',
+        'imageUrl'
     ];
 
     protected $casts = [

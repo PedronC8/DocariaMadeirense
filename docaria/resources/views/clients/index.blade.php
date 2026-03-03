@@ -1,137 +1,146 @@
-
 @extends('layouts.app')
+
+@section('title', 'Clientes - A Docaria')
+
 @section('content')
-
-
-
-<body>
 
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h1><strong>Clientes</strong></h1>
+        <h3><strong>Clientes</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
-         <a href="{{ route('clients.create') }}" class="btn btn-primary"><i class="align-middle me-2 " data-feather="plus"></i>Novo Cliente</a>
+        <a href="{{ route('clients.create') }}" class="btn btn-primary">
+            <i class="align-middle" data-feather="plus"></i> Novo Cliente
+        </a>
     </div>
 </div>
 
-
-
-
-<div class="card">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-
-        <!-- FORM começa aqui -->
-        <form method="GET" action="{{ route('clients.index') }}" class="d-flex align-items-center gap-2 w-100">
-
-            <!-- input de pesquisa -->
-            <input 
-                type="text" 
-                name="search"
-                value="{{ request('search') }}"
-
-                class="form-control ms-3" 
-                style="width:250px;" 
-                placeholder="Pesquisar por nome, telefone..."
-            >
-
-            
-
-            <!-- div para botões, empurrando para a direita -->
-            <div class="ms-auto d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i data-feather="filter"></i> Filtrar
-                </button>
-
-                <a href="{{ route('clients.index') }}" class="btn btn-secondary me-2">
-                    Limpar
-                </a>
+<!-- Filtro -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Filtrar Clientes</h5>
             </div>
+            <div class="card-body">
+                <form method="GET" action="{{ route('clients.index') }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Pesquisar</label>
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control"
+                                   placeholder="Nome, telefone, NIF..."
+                                   value="{{ request('search') }}">
+                        </div>
 
-        </form>
-        <!-- FORM termina aqui -->
+                        <div class="col-md-8 d-flex align-items-end justify-content-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="align-middle" data-feather="filter"></i> Filtrar
+                            </button>
 
+                            <a href="{{ route('clients.index') }}" class="btn btn-secondary">
+                                <i class="align-middle" data-feather="x"></i> Limpar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Lista de Clientes -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Clientes</h5>
+            </div>
+            <div class="card-body">
 
+                @if($clients->count() > 0)
 
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>NIF</th>
+                                    <th>Morada</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($clients as $client)
+                                    <tr>
+                                        <td><strong>{{ $client->name }}</strong></td>
+                                        <td>{{ $client->contact ?? '---' }}</td>
+                                        <td>{{ $client->nif ?? '---' }}</td>
+                                        <td>
+                                            {{ $client->address 
+                                                ? Str::limit($client->address, 20) 
+                                                : '---' }}
+                                        </td>
+                                        <td class="text-end">
 
+                                            <!-- Ver Detalhes -->
+                                            <a href="{{ route('clients.show', $client) }}" 
+                                               class="btn btn-sm btn-info"
+                                               title="Ver Detalhes">
+                                                <i class="align-middle" data-feather="eye"></i>
+                                            </a>
 
+                                            <!-- Editar -->
+                                            <a href="{{ route('clients.edit', $client) }}" 
+                                               class="btn btn-sm btn-warning"
+                                               title="Editar">
+                                                <i class="align-middle" data-feather="edit"></i>
+                                            </a>
 
+                                            <!-- Remover -->
+                                            <form action="{{ route('clients.destroy', $client) }}" 
+                                                  method="POST"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Tem a certeza que deseja eliminar este cliente?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-danger"
+                                                        title="Eliminar">
+                                                    <i class="align-middle" data-feather="trash-2"></i>
+                                                </button>
+                                            </form>
 
-<div class="card " >
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-    <div class="card-body p-0">
+                    <!-- Paginação igual às encomendas -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            Mostrando {{ $clients->firstItem() }} a {{ $clients->lastItem() }} de {{ $clients->total() }} clientes
+                        </div>
+                        <div>
+                            {{ $clients->links() }}
+                        </div>
+                    </div>
 
-        <table class="table table-hover  mb-0">
+                @else
+                    <div class="alert alert-info mb-0">
+                        <i class="align-middle" data-feather="info"></i>
+                        Nenhum cliente encontrado.
+                    </div>
+                @endif
 
-            <thead style="background:#e2e8f0;color:#0f172a;border-bottom:2px solid #cbd5e1;">
-    <tr>
-        <th  >Nome</th>
-
-        <th style="width:15%;">Telefone</th>
-
-        <th style="width:20%;">Nif</th>
-
-        <th style="width:15%;">Morada</th>
-
-        <th class="text-end pe-4" style="width:15%;">Ações</th>
-    </tr>
-</thead>
-
-            <tbody>
-
-                @foreach($clients as $client)
-
-                <tr >
-
-                    <td  > 
-                        {{ $client->name }} 
-                    </td>
-
-                    <td > 
-                        {{ $client->contact ? $client->contact : '---' }}
-                    </td>
-
-                    <td > 
-                        {{ $client->nif ? $client->nif : '---' }}
-                    </td>
-
-                    <td> 
-                        {{ $client->address ?
-                         (Str::length($client->address)>10 
-                          ? Str::limit($client->address,10) : $client->address)
-                        
-                         : '---' }}
-                    </td>
-
-                    <td class="text-end ">
-                        <a href="{{ route('clients.show', $client->id) }}" 
-                           class="btn btn-primary btn-sm shadow-sm">
-                           Detalhes
-                        </a>
-                    </td>
-
-                </tr>
-
-                @endforeach
-
-            </tbody>
-
-        </table>
-
+            </div>
+        </div>
     </div>
-
 </div>
-
-	<!-- Gera os links de paginação (Tailwind por padrão) -->
-{{ $clients->links() }}
-	
-</body>
-	
-
-
 
 @endsection

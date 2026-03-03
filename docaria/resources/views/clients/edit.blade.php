@@ -1,6 +1,18 @@
 @extends('layouts.app')
 @section('content')
 
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3><strong>{{$client->name}}</strong></h3>
+    </div>
+
+    <div class="col-auto ms-auto text-end mt-n1">
+        <a href="{{ route('clients.index') }}" class="btn btn-primary">
+             Voltar 
+        </a>
+    </div>
+</div>
+
 		   <!-- Formulário de editar cliente -->
 <form method="POST" action="{{ route('clients.update',  $client->id) }}" enctype="multipart/form-data">
     @csrf
