@@ -24,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('orders', OrderController::class);
 
     // Produtos (assumindo que vais criar depois)
+    // Route::get('products/{product}/delete', [ProductController::class,'destroyconfirm'])->name('products.delete');
+    // Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::resource('products', ProductController::class);
 
     // Clientes (assumindo que vais criar depois)
