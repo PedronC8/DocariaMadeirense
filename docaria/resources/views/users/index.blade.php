@@ -35,7 +35,7 @@
                                     <th>Nome</th>
                                     <th>Email</th>
                                     <th>Tipo de utilizador</th>
-                                    <th>Password</th>
+                                    <!-- <th>Password</th> -->
                                     <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
@@ -46,7 +46,7 @@
                                         <td><strong>{{ $user->name }}</strong></td>
                                         <td>{{ $user->email }}</td>
                                         <td>{{ $user->role ?? '---' }}</td>
-                                        <td>{{ Str::limit($user->password, 15) }}</td>
+                                        <!-- <td>{{ Str::limit($user->password, 15) }}</td> -->
 
                                         <td class="text-end">
 

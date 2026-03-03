@@ -23,7 +23,7 @@
       <th>Nome</th>
 		<th>Email</th>
 		<th>Tipo de utilizador</th>
-		<th>Password</th>
+		<!-- <th>Password</th> -->
     <th>Ações</th>
       
     </tr>
@@ -36,7 +36,7 @@
         <td>{{ $user->name }}</td>
         <td>{{ $user->email}}</td>
         <td>{{ $user->role ? $user->role : '---'}}</td>
-        <td>{{ $user->password }}</td>
+        <!-- <td>{{ $user->password }}</td> -->
         
         
         <td>

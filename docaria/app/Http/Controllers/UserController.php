@@ -23,9 +23,9 @@ class UserController extends Controller
     public function store(Request $request){
 $request->validate([
     'name' => 'required|string|max:50',
-    'nif' => 'nullable|string|max:20',
-    'contact' => 'nullable|string|max:20',
-    'address' => 'nullable|string|max:255',
+    'role' => 'nullable|string|max:20',
+    'email' => 'nullable|string|max:20',
+    'password' => 'nullable|string|max:255',
 ]);
 
 DB::table('users')->insert([
@@ -63,6 +63,7 @@ return redirect()->route('users.index')->with('success', 'Utilizador criado com 
   $user = User::findorFail($id);
   $user->name = $request->input('name');
   $user->email = $request->input('email');
+  $user->role = $request->input('role');
   $user->password = $request->input('password');
   $user->save();
 
