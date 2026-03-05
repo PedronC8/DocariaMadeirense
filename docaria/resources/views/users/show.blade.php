@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('content')
 
 <div class="row mb-2 mb-xl-3">
@@ -23,7 +23,6 @@
       <th>Nome</th>
 		<th>Email</th>
 		<th>Tipo de utilizador</th>
-		<th>Password</th>
     <th>Ações</th>
       
     </tr>
@@ -36,7 +35,6 @@
         <td>{{ $user->name }}</td>
         <td>{{ $user->email}}</td>
         <td>{{ $user->role ? $user->role : '---'}}</td>
-        <td>{{ $user->password }}</td>
         
         
         <td>

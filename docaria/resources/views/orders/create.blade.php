@@ -27,31 +27,45 @@
     .product-img {
         width: 100%;
         height: 100px;
+        overflow: hidden;
+        border-radius: 0.25rem 0.25rem 0 0;
+        background: #eef2f6;
+    }
+    .product-img img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: block;
+    }
+    .product-img-fallback {
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: #6c757d;
         font-size: 1.5rem;
         border-radius: 0.25rem 0.25rem 0 0;
     }
     .quantity-controls {
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: auto;
     }
     .quantity-controls button {
-        width: 28px;
-        height: 28px;
+        width: 56px;
+        height: 36px;
         padding: 0;
-        font-size: 1rem;
+        font-size: 1.2rem;
         line-height: 1;
     }
     .quantity-controls input {
-        width: 50px;
+        width: 56px;
+        height: 36px;
         text-align: center;
-        font-size: 0.875rem;
+        font-size: 1rem;
     }
     .category-tabs .nav-link {
         cursor: pointer;
@@ -78,6 +92,8 @@
     }
     .product-card .card-body {
         padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
     }
     .product-card .card-title {
         font-size: 0.9rem;
@@ -102,13 +118,20 @@
         min-height: 33px !important;
         padding: 0.375rem 0.75rem;
     }
+    /* Garantir que o texto do cliente não tapa o botão de limpar (x) */
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding-right: 3rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Nova Encomenda</strong></h3>
+        <h3><strong style="color: #2f4f6c;">Nova Encomenda</strong></h3>
     </div>
     <div class="col-auto ms-auto text-end mt-n1">
         <a href="{{ route('orders.index') }}" class="btn btn-secondary">
@@ -129,14 +152,12 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label">Cliente <span class="text-danger">*</span></label>
                             <select name="client_id" id="client_id" class="form-select @error('client_id') is-invalid @enderror" required>
                                 <option value="">Selecione um cliente...</option>
                                 @foreach($clients as $client)
-                                    <option value="{{ $client->id }}" 
-                                            data-phone="{{ $client->contact }}"
-                                            data-address="{{ $client->address }}"
+                                    <option value="{{ $client->id }}"
                                             {{ old('client_id') == $client->id ? 'selected' : '' }}>
                                         {{ $client->name }}
                                     </option>
@@ -145,14 +166,6 @@
                             @error('client_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Telefone</label>
-                            <input type="text" id="client_phone" class="form-control" readonly placeholder="---">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Morada</label>
-                            <input type="text" id="client_address" class="form-control" readonly placeholder="---">
                         </div>
                     </div>
                 </div>
@@ -185,7 +198,7 @@
                                    id="desiredDate" 
                                    class="form-control datepicker" 
                                    placeholder="dd/mm/aaaa"
-                                   value="{{ old('desired_date') ? \Carbon\Carbon::parse(old('desired_date'))->format('d/m/Y') : '' }}"
+                                   value="{{ old('desired_date') ? \Carbon\Carbon::parse(old('desired_date'))->format('d/m/Y') : date('d/m/Y') }}"
                                    autocomplete="off">
                             <input type="hidden" name="desired_date" id="desiredDateHidden" 
                             value="{{ old('desired_date', date('Y-m-d')) }}">
@@ -193,8 +206,8 @@
                     </div>
                     
                     <!-- Campos Hidden - preenchidos automaticamente com data atual -->
-                    <input type="hidden" name="ready_date" value="{{ date('Y-m-d') }}">
-                    <input type="hidden" name="delivery_date" value="{{ date('Y-m-d') }}">
+                    <input type="hidden" name="ready_date" value="{{ old('ready_date', date('Y-m-d')) }}">
+                    <input type="hidden" name="delivery_date" value="{{ old('delivery_date', date('Y-m-d')) }}">
                 </div>
             </div>
 
@@ -214,7 +227,7 @@
                         @endphp
                         @foreach($categories as $category)
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-category="{{ $category->id }}" type="button">
+                                <button class="nav-link" data-category="{{ $category->id }}" data-category-name="{{ $category->name }}" type="button">
                                     {{ $category->name }}
                                 </button>
                             </li>
@@ -235,7 +248,13 @@
                                  data-subcategory="{{ $product->subcategory_id ?? '' }}">
                                 <div class="card product-card h-100" data-product-id="{{ $product->id }}">
                                     <div class="product-img">
-                                        <i class="align-middle" data-feather="package"></i>
+                                        @if(!empty($product->image_path))
+                                            <img src="{{ $product->image_path }}" alt="{{ $product->name }}" loading="lazy">
+                                        @else
+                                            <div class="product-img-fallback">
+                                                <i class="align-middle" data-feather="package"></i>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="card-body">
                                         <h6 class="card-title mb-1">{{ $product->label }}</h6>
@@ -247,7 +266,7 @@
                                             </button>
                                             <input type="number" class="form-control form-control-sm product-qty" 
                                                    min="0" value="0" data-product-id="{{ $product->id }}"
-                                                   data-product-name="{{ $product->label }}"
+                                                   data-product-name="{{ $product->name }}"
                                                    data-product-price="{{ $product->price }}">
                                             <button type="button" class="btn btn-sm btn-outline-secondary increase-qty">
                                                 <i class="align-middle" data-feather="plus"></i>
@@ -277,7 +296,7 @@
                         <label class="form-label">Estado <span class="text-danger">*</span></label>
                         <select name="status" class="form-select" required>
                             <option value="preparacao" selected>Em Preparação</option>
-                            <option value="concluido">Concluído</option>
+                            <option value="concluido">Concluí­do</option>
                             <option value="entregue">Entregue</option>
                         </select>
                     </div>
@@ -300,7 +319,7 @@
 
             <!-- Card: Resumo da Encomenda -->
             <div class="card summary-card">
-                <div class="card-header text-white" style="background-color: #222e3c;">
+                <div class="card-header text-white" style="background-color: #2f4f6c;">
                     <h5 class="card-title mb-0 text-white">Resumo da Encomenda</h5>
                 </div>
                 <div class="card-body">
@@ -315,14 +334,12 @@
                         <!-- Items serão adicionados aqui dinamicamente -->
                     </div>
 
-                    <hr class="my-3">
-
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between mb-2" style="display: none !important;">
                         <span>Subtotal:</span>
                         <strong id="subtotal">0,00€</strong>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>IVA (22%):</span>
+                    <div class="d-flex justify-content-between mb-2" style="display: none !important;">
+                        <span>IVA:</span>
                         <strong id="iva">0,00€</strong>
                     </div>
                     <hr>
@@ -371,20 +388,6 @@ document.addEventListener('DOMContentLoaded', function() {
             noResults: function() { return "Nenhum cliente encontrado"; },
             searching: function() { return "A pesquisar..."; }
         },
-        minimumInputLength: 0,
-        matcher: function(params, data) {
-            if ($.trim(params.term) === '') return data;
-            if (params.term.length < 1 && data.id !== '') return null;
-            if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) return data;
-            return null;
-        }
-    });
-
-    // Atualizar informações do cliente
-    $('#client_id').on('change', function() {
-        const option = this.options[this.selectedIndex];
-        document.getElementById('client_phone').value = option.dataset.phone || '---';
-        document.getElementById('client_address').value = option.dataset.address || '---';
     });
 
     // ========================================
@@ -406,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
     flatpickr("#desiredDate", {
         dateFormat: "d/m/Y",
         locale: "pt",
-        defaultDate: "today",
+        defaultDate: document.getElementById('desiredDate').value || null,
         onChange: function(selectedDates) {
             if (selectedDates.length > 0) {
                 const date = selectedDates[0];
@@ -418,9 +421,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function parsePtDateToIso(value) {
+        if (!value) return '';
+        const parts = value.split('/');
+        if (parts.length !== 3) return '';
+        const [day, month, year] = parts;
+        if (!day || !month || !year) return '';
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    function syncDateField(inputId, hiddenId) {
+        const input = document.getElementById(inputId);
+        const hidden = document.getElementById(hiddenId);
+        if (!input || !hidden) return;
+
+        const iso = parsePtDateToIso(input.value.trim());
+        hidden.value = iso || hidden.value || '';
+    }
+
+    document.getElementById('orderDate').addEventListener('change', function() {
+        syncDateField('orderDate', 'orderDateHidden');
+    });
+
+    document.getElementById('desiredDate').addEventListener('change', function() {
+        syncDateField('desiredDate', 'desiredDateHidden');
+    });
+
+    document.getElementById('orderForm').addEventListener('submit', function() {
+        syncDateField('orderDate', 'orderDateHidden');
+        syncDateField('desiredDate', 'desiredDateHidden');
+    });
+
     // ========================================
     // 3. FILTRAR PRODUTOS POR CATEGORIA
     // ========================================
+    function normalizeCategoryName(name) {
+        return (name || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function shouldHideSubcategory(name) {
+        const normalized = normalizeCategoryName(name);
+        return normalized === 'broas' || normalized === 'rebucados';
+    }
+
     document.querySelectorAll('.category-tabs .nav-link').forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
@@ -428,8 +475,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             
             const category = this.dataset.category;
+            const categoryName = this.dataset.categoryName || '';
             
-            if (category !== 'all' && subcategoriesByCategory[category]) {
+            if (category !== 'all' && subcategoriesByCategory[category] && !shouldHideSubcategory(categoryName)) {
                 showSubcategories(category);
             } else {
                 hideSubcategories();
@@ -556,9 +604,9 @@ document.addEventListener('DOMContentLoaded', function() {
             orderItems.style.display = 'none';
             orderItems.innerHTML = '';
             submitBtn.disabled = true;
-            document.getElementById('subtotal').textContent = '0,00€';
-            document.getElementById('iva').textContent = '0,00€';
-            document.getElementById('total').textContent = '0,00€';
+            document.getElementById('subtotal').textContent = '0,00â‚¬';
+            document.getElementById('iva').textContent = '0,00â‚¬';
+            document.getElementById('total').textContent = '0,00â‚¬';
             return;
         }
 
@@ -577,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="order-item-row">
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <div class="flex-grow-1">
-                            <strong>${product.name}</strong> × ${product.quantity}
+                            <strong>${product.name}</strong> x ${product.quantity}
                         </div>
                         <div class="text-end">
                             <strong>${itemTotal.toFixed(2).replace('.', ',')}€</strong>
@@ -592,7 +640,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         orderItems.innerHTML = html;
 
-        const iva = subtotal * 0.22;  // 22% IVA Madeira
+        // Em nova encomenda, sem Nº Fatura ativo, IVA fica a 0 por defeito.
+        const iva = 0;
         const total = subtotal + iva;
 
         document.getElementById('subtotal').textContent = subtotal.toFixed(2).replace('.', ',') + '€';
@@ -605,3 +654,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
+
+
+
+
+

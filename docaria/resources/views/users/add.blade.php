@@ -26,15 +26,20 @@
 
     <div class="mb-3">
         <label for="role" class="form-label">Tipo de utilizador</label>
-        <input  name="role" type="text" class="form-control" id="email" >
-        @error('email')
+        <select name="role" class="form-select" id="role" required>
+            <option value="">Selecione...</option>
+            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+            <option value="vendedor" {{ old('role') == 'vendedor' ? 'selected' : '' }}>Vendedor</option>
+            <option value="trabalhador" {{ old('role') == 'trabalhador' ? 'selected' : '' }}>Trabalhador</option>
+        </select>
+        @error('role')
             <p class="text-danger">Erro no tipo de utilizador</p>
         @enderror
     </div>
 
 	<div class="mb-3">
         <label for="email" class="form-label">Email do utilizador</label>
-        <input  name="email" type="text" class="form-control" id="email" >
+        <input  name="email" type="email" class="form-control" id="email" value="{{ old('email') }}" required>
         @error('email')
             <p class="text-danger">Erro no email do utilizador</p>
         @enderror
@@ -42,7 +47,7 @@
 
 	<div class="mb-3">
         <label for="password" class="form-label">Password do utilizador</label>
-        <input  name="password" type="password" class="form-control" id="password" >
+        <input  name="password" type="password" class="form-control" id="password" required>
         @error('password')
             <p class="text-danger">Erro na password do utilizador</p>
         @enderror

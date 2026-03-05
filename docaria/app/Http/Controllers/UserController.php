@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -21,21 +22,21 @@ class UserController extends Controller
 
 
     public function store(Request $request){
-$request->validate([
-    'name' => 'required|string|max:50',
-    'nif' => 'nullable|string|max:20',
-    'contact' => 'nullable|string|max:20',
-    'address' => 'nullable|string|max:255',
-]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'role' => 'required|in:admin,vendedor,trabalhador',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|max:255',
+        ]);
 
-DB::table('users')->insert([
-    'name' => $request->input('name'),
-    'role' => $request->input('role'),
-    'email' => $request->input('email'),
-    'password' => $request->input('password')
-]);
+        DB::table('users')->insert([
+            'name' => $validated['name'],
+            'role' => $validated['role'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
 
-return redirect()->route('users.index')->with('success', 'Utilizador criado com sucesso');
+        return redirect()->route('users.index')->with('success', 'Utilizador criado com sucesso');
     }
 
 

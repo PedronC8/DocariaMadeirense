@@ -48,18 +48,9 @@ return redirect()->route('clients.index')->with('success', 'Cliente criado com s
     $query = Client::withCount('orders')
         ->withMax('orders', 'order_date');
 
-    // filtro simples
-    if ($request->search) {
-
-        $query->where(function($q) use ($request) {
-
-            $q->where('name', 'like', '%' . $request->search . '%')
-              ->orWhere('contact', 'like', '%' . $request->search . '%')
-              ->orWhere('nif', 'like', '%' . $request->search . '%')
-                ->orWhere('address', 'like', '%' . $request->search . '%');
-
-        });
-
+    // filtro por nome do cliente
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
 
     $clients = $query->paginate(10);

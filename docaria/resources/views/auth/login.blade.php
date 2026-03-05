@@ -58,12 +58,6 @@
                             </div>
                         </div>
 
-                        @if (Route::has('password.request'))
-                            <div class="text-center mt-3">
-                                <a href="{{ route('password.request') }}">Esqueceu-se da palavra-passe?</a>
-                            </div>
-                        @endif
-
                         @if (Route::has('register'))
                             <div class="text-center mt-3 mb-3">
                                 <a href="{{ route('register') }}" class="auth-link-primary">Registar nova conta</a>

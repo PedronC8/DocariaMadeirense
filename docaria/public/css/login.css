@@ -244,6 +244,7 @@ h1.h2 {
     border-color: #d9c1a2;
     color: var(--ink);
     font-weight: 700;
+    --bs-btn-focus-shadow-rgb: 188, 168, 121;
 }
 
 .btn-login-submit:hover,
@@ -254,13 +255,18 @@ h1.h2 {
     color: var(--ink);
 }
 
-.auth-link-primary {
-    color: var(--ink);
+.btn-login-submit:focus,
+.btn-login-submit:focus-visible,
+.btn-login-submit:active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(188, 168, 121, 0.45) !important;
 }
 
-.auth-link-primary:hover,
-.auth-link-primary:focus {
-    color: #28445c;
+a.auth-link-primary,
+a.auth-link-primary:visited,
+a.auth-link-primary:hover,
+a.auth-link-primary:focus,
+a.auth-link-primary:active {
+    color: #2f4f6c !important;
 }
 
 .alert {

@@ -6,7 +6,7 @@
 
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Gestão de Utilizadores</strong></h3>
+        <h3><strong style="color: #2f4f6c;">Gestão de Utilizadores</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
@@ -35,7 +35,6 @@
                                     <th>Nome</th>
                                     <th>Email</th>
                                     <th>Tipo de utilizador</th>
-                                    <th>Password</th>
                                     <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
@@ -46,7 +45,6 @@
                                         <td><strong>{{ $user->name }}</strong></td>
                                         <td>{{ $user->email }}</td>
                                         <td>{{ $user->role ?? '---' }}</td>
-                                        <td>{{ Str::limit($user->password, 15) }}</td>
 
                                         <td class="text-end">
 

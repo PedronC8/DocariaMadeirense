@@ -95,6 +95,34 @@ class EstatisticasController extends Controller
             'data' => $ordersByMonthData,
         ];
 
+
+        // Line: faturacao por mes (ultimos 12 meses)
+        $faturacaoByMonthRaw = DB::table('orders')
+            ->selectRaw('YEAR(order_date) as year_num, MONTH(order_date) as month_num, SUM(total) as total')
+            ->whereBetween('order_date', [$lineStartDateTime, $lineEndDateTime])
+            ->groupBy('year_num', 'month_num')
+            ->orderBy('year_num')
+            ->orderBy('month_num')
+            ->get();
+
+        $faturacaoByMonthMap = $faturacaoByMonthRaw
+            ->mapWithKeys(function ($row) {
+                $month = str_pad((string) $row->month_num, 2, '0', STR_PAD_LEFT);
+                return [$row->year_num . '-' . $month => (float) $row->total];
+            });
+
+        $faturacaoByMonthData = [];
+        $monthsPeriodFaturacao = CarbonPeriod::create($lineStart, '1 month', $lineEnd);
+
+        foreach ($monthsPeriodFaturacao as $month) {
+            $key = $month->format('Y-m');
+            $faturacaoByMonthData[] = (float) ($faturacaoByMonthMap[$key] ?? 0);
+        }
+
+        $faturacaoByMonth = [
+            'labels' => $ordersByMonthLabels,
+            'data' => $faturacaoByMonthData,
+        ];
         // Bar horizontal: top 5 clientes por faturação
         $topClients = DB::table('orders as o')
             ->join('clients as c', 'c.id', '=', 'o.client_id')
@@ -109,6 +137,15 @@ class EstatisticasController extends Controller
             'labels' => $topClients->pluck('name')->values(),
             'data' => $topClients->pluck('total_faturado')->map(fn ($value) => (float) $value)->values(),
         ];
+
+        // Lista completa: clientes por faturação (sem limite)
+        $allClients = DB::table('orders as o')
+            ->join('clients as c', 'c.id', '=', 'o.client_id')
+            ->whereBetween('o.order_date', [$periodStart, $periodEnd])
+            ->select('c.name', DB::raw('SUM(o.total) as total_faturado'))
+            ->groupBy('c.id', 'c.name')
+            ->orderByDesc('total_faturado')
+            ->get();
 
         // Bar: produtos mais vendidos (top 5 por quantidade)
         $topProducts = DB::table('order_items as oi')
@@ -125,6 +162,16 @@ class EstatisticasController extends Controller
             'labels' => $topProducts->pluck('name')->values(),
             'data' => $topProducts->pluck('total_quantity')->map(fn ($value) => (int) $value)->values(),
         ];
+
+        // Lista completa: produtos mais vendidos (sem limite)
+        $allProducts = DB::table('order_items as oi')
+            ->join('orders as o', 'o.id', '=', 'oi.order_id')
+            ->join('products as p', 'p.id', '=', 'oi.product_id')
+            ->whereBetween('o.order_date', [$periodStart, $periodEnd])
+            ->select('p.name', DB::raw('SUM(oi.quantity) as total_quantity'))
+            ->groupBy('p.id', 'p.name')
+            ->orderByDesc('total_quantity')
+            ->get();
         // Tabela: clientes com pagamentos em atraso (sem filtro temporal)
         $overdueClients = DB::table('orders as o')
             ->join('clients as c', 'c.id', '=', 'o.client_id')
@@ -145,8 +192,11 @@ class EstatisticasController extends Controller
             'ordersByStatus' => $ordersByStatus,
             'paymentsByStatus' => $paymentsByStatus,
             'ordersByMonth' => $ordersByMonth,
+            'faturacaoByMonth' => $faturacaoByMonth,
             'topClientsChart' => $topClientsChart,
             'topProductsChart' => $topProductsChart,
+            'allClients' => $allClients,
+            'allProducts' => $allProducts,
             'overdueClients' => $overdueClients,
         ]);
     }
@@ -187,3 +237,6 @@ class EstatisticasController extends Controller
         };
     }
 }
+
+
+

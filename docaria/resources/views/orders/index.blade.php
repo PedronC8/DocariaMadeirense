@@ -3,10 +3,6 @@
 @section('title', 'Encomendas - A Docaria')
 
 @push('styles')
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
@@ -24,21 +20,26 @@
     .filter-toggle-btn {
         cursor: pointer;
     }
-    
-    /* Customização do Select2 */
-    .select2-container--bootstrap-5 .select2-selection {
-        min-height: 38px;
-    }
-    .select2-container--bootstrap-5 .select2-selection--single {
-        padding: 0.375rem 0.75rem;
-    }
-
-    /* Customização do Flatpickr */
+    /* CustomizaÃ§Ã£o do Flatpickr */
     .flatpickr-input {
         background: white;
     }
     .flatpickr-calendar {
         font-family: 'Inter', sans-serif;
+    }
+    .orders-table thead th,
+    .orders-table tbody td {
+        padding-top: 0.85rem;
+        padding-bottom: 0.85rem;
+        vertical-align: middle;
+    }
+    .orders-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .status-filter-select {
+        min-width: 170px;
     }
 </style>
 @endpush
@@ -46,7 +47,7 @@
 @section('content')
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Encomendas</strong></h3>
+        <h3><strong style="color: #2f4f6c;">Encomendas</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
@@ -84,12 +85,12 @@
                             </div>
 
                             <!-- Status -->
-                            <div class="col-md-2">
+                            <div class="col-md-3 col-lg-3">
                                 <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
+                                <select name="status" class="form-select status-filter-select">
                                     <option value="">Todos</option>
-                                    <option value="preparacao" {{ request('status', 'preparacao') == 'preparacao' ? 'selected' : '' }}>Em Preparação</option>
-                                    <option value="concluido" {{ request('status') == 'concluido' ? 'selected' : '' }}>Concluído</option>
+                                    <option value="preparacao" {{ request('status') == 'preparacao' ? 'selected' : '' }}>Em Preparação</option>
+                                    <option value="concluido" {{ request('status') == 'concluido' ? 'selected' : '' }}>Concluí­do</option>
                                     <option value="entregue" {{ request('status') == 'entregue' ? 'selected' : '' }}>Entregue</option>
                                 </select>
                             </div>
@@ -105,32 +106,14 @@
                                 </select>
                             </div>
 
-                            <!-- Cliente com Select2 -->
+                            <!-- Cliente por nome -->
                             <div class="col-md-3">
                                 <label class="form-label">Cliente</label>
-                                <select name="client_id" id="clientSelect" class="form-select" data-placeholder="Selecione um cliente...">
-                                    <option value="">Todos os clientes</option>
-                                    @foreach($clients as $client)
-                                        <option value="{{ $client->id }}" {{ request('client_id') == $client->id ? 'selected' : '' }}>
-                                            {{ $client->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <input type="text" name="client_name" class="form-control" placeholder="Nome do cliente..." value="{{ request('client_name') }}">
                             </div>
-
-                            <!-- Botões -->
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary me-2">
-                                    <i class="align-middle" data-feather="filter"></i> Filtrar
-                                </button>
-                                <a href="{{ route('orders.index') }}" class="btn btn-secondary">
-                                    <i class="align-middle" data-feather="x"></i>
-                                </a>
-                            </div>
-
-                            <!-- Data Início com Flatpickr -->
+<!-- Data Iní­cio com Flatpickr -->
                             <div class="col-md-3">
-                                <label class="form-label">Data Início</label>
+                                <label class="form-label">Data Iní­cio</label>
                                 <input type="text" 
                                        name="date_from" 
                                        id="dateFrom" 
@@ -153,9 +136,18 @@
                                        autocomplete="off">
                                 <input type="hidden" name="date_to_hidden" id="dateToHidden" value="{{ request('date_to') }}">
                             </div>
+                            <!-- Botões -->
+                            <div class="col-12 d-flex align-items-end justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="align-middle" data-feather="filter"></i> Filtrar
+                                </button>
+                                <a href="{{ route('orders.index') }}" class="btn btn-secondary">
+                                    <i class="align-middle" data-feather="x"></i> Limpar
+                                </a>
+                            </div>
 
                             <!-- Info sobre filtro ativo -->
-                            @if(request()->hasAny(['search', 'status', 'payment_status', 'client_id', 'date_from', 'date_to']) && request('status') != 'preparacao')
+                            @if(request()->hasAny(['search', 'status', 'payment_status', 'client_name', 'date_from', 'date_to']) && request('status') != 'preparacao')
                                 <div class="col-12">
                                     <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center">
                                         <span>
@@ -182,7 +174,7 @@
             <div class="card-header">
                 <h5 class="card-title mb-0">
                     Lista de Encomendas
-                    @if(request('status') == 'preparacao' && !request()->hasAny(['search', 'payment_status', 'client_id', 'date_from', 'date_to']))
+                    @if(request('status') == 'preparacao' && !request()->hasAny(['search', 'payment_status', 'client_name', 'date_from', 'date_to']))
                         <span class="badge bg-warning">Em Preparação</span>
                     @endif
                 </h5>
@@ -190,7 +182,7 @@
             <div class="card-body">
                 @if($orders->count() > 0)
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover orders-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -217,7 +209,7 @@
                                             {{ \Illuminate\Support\Str::limit($order->client->name, 25) }}
                                         </td>
                                         <td>{{ $order->order_date->format('d/m/Y') }}</td>
-                                        <td>{{ $order->delivery_date->format('d/m/Y') }}</td>
+                                        <td>{{ $order->delivery_date ? $order->delivery_date->format('d/m/Y') : 'N/A' }}</td>
                                         <td><strong>{{ number_format($order->total, 2, ',', '.') }}€</strong></td>
                                         <td>
                                             <span class="badge bg-{{ $order->status_badge }}">
@@ -230,28 +222,30 @@
                                             </span>
                                         </td>
                                         <td class="text-end">
-                                            <a href="{{ route('orders.show', $order) }}" 
-                                               class="btn btn-sm btn-info" 
-                                               title="Ver Detalhes">
-                                                <i class="align-middle" data-feather="eye"></i>
-                                            </a>
-                                            <a href="{{ route('orders.edit', $order) }}" 
-                                               class="btn btn-sm btn-warning" 
-                                               title="Editar">
-                                                <i class="align-middle" data-feather="edit"></i>
-                                            </a>
-                                            <form action="{{ route('orders.destroy', $order) }}" 
-                                                  method="POST" 
-                                                  class="d-inline"
-                                                  onsubmit="return confirm('Tem a certeza que deseja eliminar esta encomenda?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-danger" 
-                                                        title="Eliminar">
-                                                    <i class="align-middle" data-feather="trash-2"></i>
-                                                </button>
-                                            </form>
+                                            <div class="orders-actions">
+                                                <a href="{{ route('orders.show', $order) }}" 
+                                                   class="btn btn-sm btn-info" 
+                                                   title="Ver Detalhes">
+                                                    <i class="align-middle" data-feather="eye"></i>
+                                                </a>
+                                                <a href="{{ route('orders.edit', $order) }}" 
+                                                   class="btn btn-sm btn-warning" 
+                                                   title="Editar">
+                                                    <i class="align-middle" data-feather="edit"></i>
+                                                </a>
+                                                <form action="{{ route('orders.destroy', $order) }}" 
+                                                      method="POST" 
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Tem a certeza que deseja eliminar esta encomenda?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="btn btn-sm btn-danger" 
+                                                            title="Eliminar">
+                                                        <i class="align-middle" data-feather="trash-2"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -259,13 +253,13 @@
                         </table>
                     </div>
 
-                    <!-- Paginação -->
+                    <!-- PaginaÃ§Ã£o -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div>
                             Mostrando de {{ $orders->firstItem() }} a {{ $orders->lastItem() }} de {{ $orders->total() }} encomendas
                         </div>
                         <div>
-                            {{ $orders->appends(request()->query())->links() }}
+                            {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
                         </div>
                     </div>
                 @else
@@ -281,11 +275,8 @@
 @endsection
 
 @push('scripts')
-<!-- jQuery (necessário para o Select2) -->
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -302,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterText = document.getElementById('filterText');
 
     const hasActiveFilters = {{ 
-        request()->hasAny(['search', 'payment_status', 'client_id', 'date_from', 'date_to']) || 
+        request()->hasAny(['search', 'payment_status', 'client_name', 'date_from', 'date_to']) || 
         (request('status') && request('status') != 'preparacao') ? 'true' : 'false' 
     }};
 
@@ -332,49 +323,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // 2. INICIALIZAR SELECT2 (CLIENTE)
-    // ========================================
-    $('#clientSelect').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        placeholder: 'Selecione um cliente...',
-        allowClear: true,
-        language: {
-            noResults: function() {
-                return "Nenhum cliente encontrado";
-            },
-            searching: function() {
-                return "A pesquisar...";
-            }
-        },
-        minimumInputLength: 0,
-        matcher: function(params, data) {
-            if ($.trim(params.term) === '') {
-                return data;
-            }
-
-            if (params.term.length < 1 && data.id !== '') {
-                return null;
-            }
-
-            if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) {
-                return data;
-            }
-
-            return null;
-        }
-    });
-
-    // ========================================
-    // 3. INICIALIZAR FLATPICKR (DATAS EM PORTUGUÊS)
+    // 3. INICIALIZAR FLATPICKR (DATAS EM PORTUGUÃŠS)
     // ========================================
     
-    // Data Início
+    // Data InÃ­cio
     const dateFromPicker = flatpickr("#dateFrom", {
         dateFormat: "d/m/Y",      // Formato visual: dd/mm/yyyy
         altInput: false,
         allowInput: true,
-        locale: "pt",              // Português
+        locale: "pt",              // PortuguÃªs
         onChange: function(selectedDates, dateStr, instance) {
             if (selectedDates.length > 0) {
                 // Converter para yyyy-mm-dd para o backend
@@ -410,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 4. SUBMETER FORM COM VALORES CORRETOS
     // ========================================
     document.getElementById('filterForm').addEventListener('submit', function(e) {
-        // Substituir valores dos campos visíveis pelos hidden
+        // Substituir valores dos campos visÃ­veis pelos hidden
         const dateFromHidden = document.getElementById('dateFromHidden').value;
         const dateToHidden = document.getElementById('dateToHidden').value;
         
@@ -442,3 +399,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 </script>
 @endpush
+
+
+
+
+
+
+
+
+
+

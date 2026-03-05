@@ -11,21 +11,18 @@ use App\Http\Controllers\UserController;
 
 // Rota pública (login)
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('orders.index');
+    }
+
     return redirect()->route('login');
 });
 
 // Rotas protegidas por autenticação
 Route::middleware(['auth'])->group(function () {
     
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    // Estatísticas
-    Route::get('/statistics', [EstatisticasController::class, 'index'])->name('statistics');
-
     // Encomendas - CRUD Completo
+    Route::post('orders/{order}/quick-update', [OrderController::class, 'quickUpdate'])->name('orders.quick-update');
     Route::resource('orders', OrderController::class);
 
     // Produtos (assumindo que vais criar depois)
@@ -36,7 +33,11 @@ Route::middleware(['auth'])->group(function () {
     // Clientes (assumindo que vais criar depois)
     Route::resource('clients', ClientController::class);
 
-    Route::resource('users', UserController::class);
+    // Apenas admin: Estatísticas e Administração
+    Route::middleware('admin')->group(function () {
+        Route::get('/statistics', [EstatisticasController::class, 'index'])->name('statistics');
+        Route::resource('users', UserController::class);
+    });
 
 
 });

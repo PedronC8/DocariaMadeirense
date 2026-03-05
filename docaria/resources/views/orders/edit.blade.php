@@ -27,31 +27,45 @@
     .product-img {
         width: 100%;
         height: 100px;
+        overflow: hidden;
+        border-radius: 0.25rem 0.25rem 0 0;
+        background: #eef2f6;
+    }
+    .product-img img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: block;
+    }
+    .product-img-fallback {
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: #6c757d;
         font-size: 1.5rem;
         border-radius: 0.25rem 0.25rem 0 0;
     }
     .quantity-controls {
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: auto;
     }
     .quantity-controls button {
-        width: 28px;
-        height: 28px;
+        width: 56px;
+        height: 36px;
         padding: 0;
-        font-size: 1rem;
+        font-size: 1.2rem;
         line-height: 1;
     }
     .quantity-controls input {
-        width: 50px;
+        width: 56px;
+        height: 36px;
         text-align: center;
-        font-size: 0.875rem;
+        font-size: 1rem;
     }
     .category-tabs .nav-link {
         cursor: pointer;
@@ -78,6 +92,8 @@
     }
     .product-card .card-body {
         padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
     }
     .product-card .card-title {
         font-size: 0.9rem;
@@ -110,6 +126,13 @@
         min-height: 33px !important;
         padding: 0.375rem 0.75rem;
     }
+    /* Garantir que o texto do cliente nÃƒÂ£o tapa o botÃƒÂ£o de limpar (x) */
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding-right: 3rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>
 @endpush
 
@@ -133,7 +156,7 @@
     @method('PUT')
     
     <div class="row">
-        <!-- Área Principal -->
+        <!-- ÃƒÂrea Principal -->
         <div class="col-lg-8">
             <!-- Card: Cliente -->
             <div class="card mb-3">
@@ -142,14 +165,12 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-8">
                             <label class="form-label">Cliente <span class="text-danger">*</span></label>
                             <select name="client_id" id="client_id" class="form-select @error('client_id') is-invalid @enderror" required>
                                 <option value="">Selecione um cliente...</option>
                                 @foreach($clients as $client)
                                     <option value="{{ $client->id }}" 
-                                            data-phone="{{ $client->contact }}"
-                                            data-address="{{ $client->address }}"
                                             {{ ($order->client_id == $client->id || old('client_id') == $client->id) ? 'selected' : '' }}>
                                         {{ $client->name }}
                                     </option>
@@ -159,17 +180,7 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Telefone</label>
-                            <input type="text" id="client_phone" class="form-control" readonly 
-                                   value="{{ $order->client->contact ?? '---' }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Morada</label>
-                            <input type="text" id="client_address" class="form-control" readonly 
-                                   value="{{ $order->client->address ?? '---' }}">
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label d-flex align-items-center">
                                 <input type="checkbox" id="hasInvoice" class="form-check-input me-2" 
                                        {{ $order->invoice ? 'checked' : '' }}>
@@ -185,7 +196,7 @@
                 </div>
             </div>
 
-            <!-- Card: Datas (4 campos visíveis) -->
+            <!-- Card: Datas (4 campos visÃƒÂ­veis) -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Datas</h5>
@@ -206,27 +217,25 @@
                             @enderror
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Pronto Em <span class="text-danger">*</span></label>
+                            <label class="form-label">Pronto Em</label>
                             <input type="text" 
                                    id="readyDate" 
                                    class="form-control datepicker" 
-                                   value="{{ $order->ready_date->format('d/m/Y') }}"
-                                   autocomplete="off" 
-                                   required>
-                            <input type="hidden" name="ready_date" id="readyDateHidden" value="{{ $order->ready_date->format('Y-m-d') }}">
+                                   value="{{ $order->ready_date ? $order->ready_date->format('d/m/Y') : '' }}"
+                                   autocomplete="off">
+                            <input type="hidden" name="ready_date" id="readyDateHidden" value="{{ $order->ready_date ? $order->ready_date->format('Y-m-d') : '' }}">
                             @error('ready_date')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Data Entrega <span class="text-danger">*</span></label>
+                            <label class="form-label">Data Entrega</label>
                             <input type="text" 
                                    id="deliveryDate" 
                                    class="form-control datepicker" 
-                                   value="{{ $order->delivery_date->format('d/m/Y') }}"
-                                   autocomplete="off" 
-                                   required>
-                            <input type="hidden" name="delivery_date" id="deliveryDateHidden" value="{{ $order->delivery_date->format('Y-m-d') }}">
+                                   value="{{ $order->delivery_date ? $order->delivery_date->format('d/m/Y') : '' }}"
+                                   autocomplete="off">
+                            <input type="hidden" name="delivery_date" id="deliveryDateHidden" value="{{ $order->delivery_date ? $order->delivery_date->format('Y-m-d') : '' }}">
                             @error('delivery_date')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -260,7 +269,7 @@
                         @endphp
                         @foreach($categories as $category)
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-category="{{ $category->id }}" type="button">
+                                <button class="nav-link" data-category="{{ $category->id }}" data-category-name="{{ $category->name }}" type="button">
                                     {{ $category->name }}
                                 </button>
                             </li>
@@ -285,7 +294,13 @@
                                  data-subcategory="{{ $product->subcategory_id ?? '' }}">
                                 <div class="card product-card h-100 {{ $quantity > 0 ? 'selected' : '' }}" data-product-id="{{ $product->id }}">
                                     <div class="product-img">
-                                        <i class="align-middle" data-feather="package"></i>
+                                        @if(!empty($product->image_path))
+                                            <img src="{{ $product->image_path }}" alt="{{ $product->name }}" loading="lazy">
+                                        @else
+                                            <div class="product-img-fallback">
+                                                <i class="align-middle" data-feather="package"></i>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="card-body">
                                         <h6 class="card-title mb-1">{{ $product->label }}</h6>
@@ -297,7 +312,7 @@
                                             </button>
                                             <input type="number" class="form-control form-control-sm product-qty" 
                                                    min="0" value="{{ $quantity }}" data-product-id="{{ $product->id }}"
-                                                   data-product-name="{{ $product->label }}"
+                                                   data-product-name="{{ $product->name }}"
                                                    data-product-price="{{ $product->price }}">
                                             <button type="button" class="btn btn-sm btn-outline-secondary increase-qty">
                                                 <i class="align-middle" data-feather="plus"></i>
@@ -320,14 +335,14 @@
                     <h5 class="card-title mb-0">Informações Adicionais</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Trabalhador responsável HIDDEN - atualiza com ID do utilizador logado -->
+                    <!-- Trabalhador responsÃƒÂ¡vel HIDDEN - atualiza com ID do utilizador logado -->
                     <input type="hidden" name="trabalhador_id" value="{{ Auth::id() }}">
                     
                     <div class="mb-3">
                         <label class="form-label">Estado <span class="text-danger">*</span></label>
                         <select name="status" class="form-select" required>
                             <option value="preparacao" {{ $order->status == 'preparacao' ? 'selected' : '' }}>Em Preparação</option>
-                            <option value="concluido" {{ $order->status == 'concluido' ? 'selected' : '' }}>Concluído</option>
+                            <option value="concluido" {{ $order->status == 'concluido' ? 'selected' : '' }}>Conclusão</option>
                             <option value="entregue" {{ $order->status == 'entregue' ? 'selected' : '' }}>Entregue</option>
                         </select>
                     </div>
@@ -350,7 +365,7 @@
 
             <!-- Card: Resumo -->
             <div class="card summary-card">
-                <div class="card-header bg-warning text-white">
+                <div class="card-header text-white" style="background-color: #2f4f6c;">
                     <h5 class="card-title mb-0 text-white">Resumo da Encomenda</h5>
                 </div>
                 <div class="card-body">
@@ -365,23 +380,23 @@
                         <!-- Items dinâmicos -->
                     </div>
 
-                    <div id="pricingSection">
+                                        <div id="pricingSection">
                         <hr class="my-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
-                            <strong id="subtotal">0,00€</strong>
+                            <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end" style="max-width: 130px;" id="subtotalInput" name="manual_subtotal" value="{{ number_format((float) $order->subtotal, 2, '.', '') }}" readonly>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <span>IVA (22%):</span>
-                            <strong id="iva">0,00€</strong>
+                            <span>IVA:</span>
+                            <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end" style="max-width: 130px; background-color: #fff; opacity: 1;" id="ivaInput" value="{{ number_format((float) $order->iva, 2, '.', '') }}" readonly disabled tabindex="-1">
+                            <input type="hidden" id="manualIvaHidden" name="manual_iva" value="{{ number_format((float) $order->iva, 2, '.', '') }}">
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <h5 class="mb-0">Total:</h5>
-                            <h5 class="mb-0 text-primary" id="total">0,00€</h5>
+                            <h5 class="mb-0 text-primary" id="total">0,00&euro;</h5>
                         </div>
                     </div>
-
                     <div id="invoiceMessage" style="display: none;">
                         <hr class="my-3">
                         <div class="alert alert-info mb-3">
@@ -445,20 +460,8 @@ document.addEventListener('DOMContentLoaded', function() {
             noResults: function() { return "Nenhum cliente encontrado"; },
             searching: function() { return "A pesquisar..."; }
         },
-        minimumInputLength: 0,
-        matcher: function(params, data) {
-            if ($.trim(params.term) === '') return data;
-            if (params.term.length < 3 && data.id !== '') return null;
-            if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) return data;
-            return null;
-        }
     });
 
-    $('#client_id').on('change', function() {
-        const option = this.options[this.selectedIndex];
-        document.getElementById('client_phone').value = option.dataset.phone || '---';
-        document.getElementById('client_address').value = option.dataset.address || '---';
-    });
 
     // ========================================
     // 2. FLATPICKR (DATAS)
@@ -472,6 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const date = selectedDates[0];
                     const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                     document.getElementById(hiddenId).value = formatted;
+                } else {
+                    document.getElementById(hiddenId).value = '';
                 }
             }
         });
@@ -483,48 +488,43 @@ document.addEventListener('DOMContentLoaded', function() {
     initDatePicker('desiredDate', 'desiredDateHidden');
 
     // ========================================
-    // 3. LÓGICA DA FATURA
+    // 3. LÃƒâ€œGICA DA FATURA
     // ========================================
     const hasInvoiceCheckbox = document.getElementById('hasInvoice');
     const invoiceNumberInput = document.getElementById('invoiceNumber');
     const pricingSection = document.getElementById('pricingSection');
     const invoiceMessage = document.getElementById('invoiceMessage');
     const paymentStatus = document.getElementById('paymentStatus');
+    const subtotalInput = document.getElementById('subtotalInput');
+    const ivaInput = document.getElementById('ivaInput');
+    const manualIvaHidden = document.getElementById('manualIvaHidden');
+    let subtotalEdited = false;
 
     function toggleInvoiceMode(enabled) {
         if (enabled) {
             // Ativar modo fatura
             invoiceNumberInput.classList.add('enabled');
             invoiceNumberInput.required = true;
-            invoiceNumberInput.disabled = false;  // ← IMPORTANTE: Ativar input
-            pricingSection.style.display = 'none';
-            invoiceMessage.style.display = 'block';
+            invoiceNumberInput.disabled = false;  // AÇÃO IMPORTANTE: Ativar input
+            subtotalInput.readOnly = false;
+            ivaInput.readOnly = true;
+            ivaInput.disabled = true;
+            invoiceMessage.style.display = 'none';
             
-            // Selecionar "Pago" mas deixar campo DESBLOQUEADO
-            paymentStatus.value = 'pago';
-            // Forçar a seleção da opção correta
-            Array.from(paymentStatus.options).forEach(option => {
-                if (option.value === 'pago') {
-                    option.selected = true;
-                }
-            });
+            // Nao alterar o estado de pagamento automaticamente
         } else {
             // Desativar modo fatura
             invoiceNumberInput.classList.remove('enabled');
             invoiceNumberInput.required = false;
-            invoiceNumberInput.disabled = true;  // ← IMPORTANTE: Desativar input
-            invoiceNumberInput.value = '';       // ← LIMPAR valor
-            pricingSection.style.display = 'block';
+            invoiceNumberInput.disabled = true;  // AÇÃO IMPORTANTE: Desativar input
+            invoiceNumberInput.value = '';       // AÇÃO LIMPAR valor
+            subtotalInput.readOnly = true;
+            ivaInput.readOnly = true;
+            ivaInput.disabled = true;
+            subtotalEdited = false;
             invoiceMessage.style.display = 'none';
             
-            // Selecionar "Não Pago" mas deixar campo DESBLOQUEADO
-            paymentStatus.value = 'nao_pago';
-            // Forçar a seleção da opção correta
-            Array.from(paymentStatus.options).forEach(option => {
-                if (option.value === 'nao_pago') {
-                    option.selected = true;
-                }
-            });
+            // Nao alterar o estado de pagamento automaticamente
         }
     }
 
@@ -541,6 +541,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // 4. FILTROS CATEGORIA/SUBCATEGORIA
     // ========================================
+    function normalizeCategoryName(name) {
+        return (name || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function shouldHideSubcategory(name) {
+        const normalized = normalizeCategoryName(name);
+        return normalized === 'broas' || normalized === 'rebucados';
+    }
+
     document.querySelectorAll('.category-tabs .nav-link').forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
@@ -548,8 +561,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             
             const category = this.dataset.category;
+            const categoryName = this.dataset.categoryName || '';
             
-            if (category !== 'all' && subcategoriesByCategory[category]) {
+            if (category !== 'all' && subcategoriesByCategory[category] && !shouldHideSubcategory(categoryName)) {
                 showSubcategories(category);
             } else {
                 hideSubcategories();
@@ -661,6 +675,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // 6. ATUALIZAR RESUMO
     // ========================================
+    function formatCurrency(value) {
+        return Number(value || 0).toFixed(2).replace('.', ',') + String.fromCharCode(8364);
+    }
+
+    function updateTotalFromInputs() {
+        const subtotalValue = parseFloat(subtotalInput.value) || 0;
+        const ivaValue = hasInvoiceCheckbox.checked ? (subtotalValue * 0.22) : 0;
+        ivaInput.value = ivaValue.toFixed(2);
+        manualIvaHidden.value = ivaValue.toFixed(2);
+        const total = subtotalValue + ivaValue;
+        document.getElementById('total').textContent = formatCurrency(total);
+    }
+
+    subtotalInput.addEventListener('input', function() {
+        subtotalEdited = true;
+        updateTotalFromInputs();
+    });
+
     function updateSummary() {
         const orderItems = document.getElementById('orderItems');
         const orderSummary = document.getElementById('orderSummary');
@@ -674,9 +706,10 @@ document.addEventListener('DOMContentLoaded', function() {
             orderItems.style.display = 'none';
             orderItems.innerHTML = '';
             submitBtn.disabled = true;
-            document.getElementById('subtotal').textContent = '0,00€';
-            document.getElementById('iva').textContent = '0,00€';
-            document.getElementById('total').textContent = '0,00€';
+            subtotalInput.value = '0.00';
+            ivaInput.value = '0.00';
+            manualIvaHidden.value = '0.00';
+            document.getElementById('total').textContent = '0,00' + String.fromCharCode(8364);
             return;
         }
 
@@ -691,13 +724,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemTotal = product.price * product.quantity;
             subtotal += itemTotal;
             
-            // SE TEM FATURA: Esconde valores (unitário e total)
+            // SE TEM FATURA: Esconde valores (unitÃƒÂ¡rio e total)
             if (hasInvoice) {
                 html += `
                     <div class="order-item-row">
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div class="flex-grow-1">
-                                <strong>${product.name}</strong> × ${product.quantity}
+                                <strong>${product.name}</strong> x ${product.quantity}
                             </div>
                         </div>
                         <input type="hidden" name="products[${productId}][id]" value="${productId}">
@@ -710,13 +743,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="order-item-row">
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div class="flex-grow-1">
-                                <strong>${product.name}</strong> × ${product.quantity}
+                                <strong>${product.name}</strong> x ${product.quantity}
                             </div>
                             <div class="text-end">
-                                <strong>${itemTotal.toFixed(2).replace('.', ',')}€</strong>
+                                <strong>${itemTotal.toFixed(2).replace('.', ',')}${String.fromCharCode(8364)}</strong>
                             </div>
                         </div>
-                        <small class="text-muted">${product.price.toFixed(2).replace('.', ',')}€ cada</small>
+                        <small class="text-muted">${product.price.toFixed(2).replace('.', ',')}${String.fromCharCode(8364)} cada</small>
                         <input type="hidden" name="products[${productId}][id]" value="${productId}">
                         <input type="hidden" name="products[${productId}][quantity]" value="${product.quantity}">
                     </div>
@@ -726,12 +759,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         orderItems.innerHTML = html;
 
-        const iva = subtotal * 0.22;
-        const total = subtotal + iva;
+        const computedIva = subtotal * 0.22;
 
-        document.getElementById('subtotal').textContent = subtotal.toFixed(2).replace('.', ',') + '€';
-        document.getElementById('iva').textContent = iva.toFixed(2).replace('.', ',') + '€';
-        document.getElementById('total').textContent = total.toFixed(2).replace('.', ',') + '€';
+        if (!hasInvoice) {
+            subtotalInput.value = subtotal.toFixed(2);
+            ivaInput.value = '0.00';
+            manualIvaHidden.value = '0.00';
+            updateTotalFromInputs();
+            return;
+        }
+
+        // Em modo fatura, permite ajuste manual apenas de subtotal.
+        if (!subtotalEdited) {
+            subtotalInput.value = subtotal.toFixed(2);
+        }
+
+        // IVA fica sempre automático (nunca manual).
+        ivaInput.value = computedIva.toFixed(2);
+
+        updateTotalFromInputs();
     }
 
     // Atualizar sumário inicial
@@ -742,3 +788,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

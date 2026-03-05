@@ -2,11 +2,28 @@
 
 @section('title', 'Clientes - A Docaria')
 
+@push('styles')
+<style>
+    .filters-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    .filters-container.show {
+        max-height: 260px;
+        transition: max-height 0.5s ease-in;
+    }
+    .filter-toggle-btn {
+        cursor: pointer;
+    }
+</style>
+@endpush
+
 @section('content')
 
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Clientes</strong></h3>
+        <h3><strong style="color: #2f4f6c;">Clientes</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
@@ -20,32 +37,40 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Filtrar Clientes</h5>
+            <div class="card-header d-flex justify-content-between align-items-center filter-toggle-btn" id="filterToggle">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle" data-feather="filter"></i> Filtrar Clientes
+                </h5>
+                <button type="button" class="btn btn-sm btn-outline-primary">
+                    <i class="align-middle" data-feather="chevron-down" id="filterIcon"></i>
+                    <span id="filterText">Mostrar Filtros</span>
+                </button>
             </div>
-            <div class="card-body">
-                <form method="GET" action="{{ route('clients.index') }}">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Pesquisar</label>
-                            <input type="text" 
-                                   name="search" 
-                                   class="form-control"
-                                   placeholder="Nome, telefone, NIF..."
-                                   value="{{ request('search') }}">
-                        </div>
+            <div class="filters-container" id="filtersContainer">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('clients.index') }}">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Pesquisar por nome</label>
+                                <input type="text" 
+                                       name="search" 
+                                       class="form-control"
+                                       placeholder="Nome do cliente..."
+                                       value="{{ request('search') }}">
+                            </div>
 
-                        <div class="col-md-8 d-flex align-items-end justify-content-end">
-                            <button type="submit" class="btn btn-primary me-2">
-                                <i class="align-middle" data-feather="filter"></i> Filtrar
-                            </button>
+                            <div class="col-md-8 d-flex align-items-end justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="align-middle" data-feather="filter"></i> Filtrar
+                                </button>
 
-                            <a href="{{ route('clients.index') }}" class="btn btn-secondary">
-                                <i class="align-middle" data-feather="x"></i> Limpar
-                            </a>
+                                <a href="{{ route('clients.index') }}" class="btn btn-secondary">
+                                    <i class="align-middle" data-feather="x"></i> Limpar
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -127,7 +152,7 @@
                             Mostrando {{ $clients->firstItem() }} a {{ $clients->lastItem() }} de {{ $clients->total() }} clientes
                         </div>
                         <div>
-                            {{ $clients->links() }}
+                            {{ $clients->appends(request()->query())->links() }}
                         </div>
                     </div>
 
@@ -144,3 +169,37 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterToggle = document.getElementById('filterToggle');
+    const filtersContainer = document.getElementById('filtersContainer');
+    const filterIcon = document.getElementById('filterIcon');
+    const filterText = document.getElementById('filterText');
+
+    const hasActiveFilters = {{ request()->filled('search') ? 'true' : 'false' }};
+
+    if (hasActiveFilters) {
+        filtersContainer.classList.add('show');
+        filterText.textContent = 'Esconder Filtros';
+        filterIcon.setAttribute('data-feather', 'chevron-up');
+        if (typeof feather !== 'undefined') feather.replace();
+    }
+
+    filterToggle.addEventListener('click', function() {
+        filtersContainer.classList.toggle('show');
+
+        if (filtersContainer.classList.contains('show')) {
+            filterText.textContent = 'Esconder Filtros';
+            filterIcon.setAttribute('data-feather', 'chevron-up');
+        } else {
+            filterText.textContent = 'Mostrar Filtros';
+            filterIcon.setAttribute('data-feather', 'chevron-down');
+        }
+
+        if (typeof feather !== 'undefined') feather.replace();
+    });
+});
+</script>
+@endpush

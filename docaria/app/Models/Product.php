@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -78,5 +79,31 @@ class Product extends Model
     public function getStatusLabelAttribute(): string
     {
         return $this->active ? 'Ativo' : 'Inativo';
+    }
+
+    /**
+     * URL normalizada da imagem do produto.
+     */
+    public function getImagePathAttribute(): ?string
+    {
+        $imageUrl = $this->attributes['imageUrl'] ?? null;
+
+        if (empty($imageUrl)) {
+            return null;
+        }
+
+        if (
+            str_starts_with($imageUrl, 'http://') ||
+            str_starts_with($imageUrl, 'https://') ||
+            str_starts_with($imageUrl, '/')
+        ) {
+            return $imageUrl;
+        }
+
+        if (str_starts_with($imageUrl, 'storage/')) {
+            return '/' . $imageUrl;
+        }
+
+        return Storage::url($imageUrl);
     }
 }

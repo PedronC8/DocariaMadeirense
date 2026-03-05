@@ -66,7 +66,7 @@
                         </div>
 
                         <div class="text-center mt-3 mb-3">
-                            <a href="{{ route('login') }}" class="auth-link-primary">Voltar para o Login</a>
+                            <a href="{{ route('login') }}" class="auth-link-primary" style="color: #2f4f6c;">Voltar para o Login</a>
                         </div>
                     </div>
                 </div>

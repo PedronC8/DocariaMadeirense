@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -19,14 +20,15 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = Order::with(['client', 'vendedor', 'trabalhador'])
-            ->orderBy('order_date', 'desc');
-
-        // Filtro padrão: mostrar apenas encomendas em preparação
-        // A menos que outros filtros sejam aplicados
-        if (!$request->hasAny(['search', 'payment_status', 'client_id', 'date_from', 'date_to']) 
-            && !$request->has('status')) {
-            $query->status('preparacao');
-        }
+            ->orderByRaw("CASE status 
+                WHEN 'preparacao' THEN 1
+                WHEN 'concluido' THEN 2
+                WHEN 'entregue' THEN 3
+                ELSE 4
+            END")
+            ->orderByRaw('delivery_date IS NULL')
+            ->orderBy('delivery_date', 'asc')
+            ->orderBy('id', 'asc');
 
         // Filtros aplicados pelo utilizador
         if ($request->filled('status')) {
@@ -37,8 +39,11 @@ class OrderController extends Controller
             $query->paymentStatus($request->payment_status);
         }
 
-        if ($request->filled('client_id')) {
-            $query->client($request->client_id);
+        if ($request->filled('client_name')) {
+            $clientName = $request->client_name;
+            $query->whereHas('client', function($q) use ($clientName) {
+                $q->where('name', 'like', "%{$clientName}%");
+            });
         }
 
         // Filtro de pesquisa
@@ -62,9 +67,7 @@ class OrderController extends Controller
         }
 
         $orders = $query->paginate(15);
-        $clients = Client::orderBy('name')->get();
-
-        return view('orders.index', compact('orders', 'clients'));
+        return view('orders.index', compact('orders'));
     }
 
     /**
@@ -75,7 +78,7 @@ class OrderController extends Controller
         $clients = Client::orderBy('name')->get();
         $products = Product::active()
             ->with('subcategory.category')
-            ->orderBy('name')
+            ->orderBy('id', 'asc')
             ->get();
         $users = User::where('role', 'trabalhador')->get();
 
@@ -89,10 +92,12 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'invoice' => 'nullable|string|max:255',  // ← ADICIONADO
+            'invoice' => 'nullable|string|max:255',
+            'manual_subtotal' => 'nullable|numeric|min:0',
+            'manual_iva' => 'nullable|numeric|min:0',
             'order_date' => 'required|date',
-            'ready_date' => 'required|date|after_or_equal:order_date',
-            'delivery_date' => 'required|date|after_or_equal:ready_date',
+            'ready_date' => 'nullable|date|after_or_equal:order_date',
+            'delivery_date' => 'nullable|date|after_or_equal:ready_date',
             'desired_date' => 'nullable|date',
             'status' => 'required|in:preparacao,concluido,entregue',
             'payment_status' => 'required|in:nao_pago,pago,parcial',
@@ -114,18 +119,29 @@ class OrderController extends Controller
                 $subtotal += $product->price * $item['quantity'];
             }
 
-            $iva = $subtotal * 0.23; // 23% IVA
+            $hasInvoice = !empty($validated['invoice']);
+            if ($hasInvoice && $request->filled('manual_subtotal')) {
+                $subtotal = (float) $validated['manual_subtotal'];
+            }
+            $iva = $hasInvoice ? ($subtotal * 0.22) : 0;
             $total = $subtotal + $iva;
+
+
+            // Compatibilidade com BD (delivery_date nao pode ficar null)
+            $readyDate = $validated['ready_date'] ?? $validated['order_date'];
+            $deliveryDate = $validated['status'] === 'entregue'
+                ? Carbon::today()->toDateString()
+                : $validated['order_date'];
 
             // Criar encomenda
             $order = Order::create([
                 'client_id' => $validated['client_id'],
                 'vendedor_id' => Auth::id(),
                 'trabalhador_id' => $validated['trabalhador_id'] ?? null,
-                'invoice' => $validated['invoice'] ?? null,  // ← ADICIONADO
+                'invoice' => $validated['invoice'] ?? null,  // â† ADICIONADO
                 'order_date' => $validated['order_date'],
-                'ready_date' => $validated['ready_date'],
-                'delivery_date' => $validated['delivery_date'],
+                'ready_date' => $readyDate,
+                'delivery_date' => $deliveryDate,
                 'desired_date' => $validated['desired_date'],
                 'subtotal' => $subtotal,
                 'iva' => $iva,
@@ -193,10 +209,12 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'invoice' => 'nullable|string|max:255',  // ← ADICIONADO
+            'invoice' => 'nullable|string|max:255',
+            'manual_subtotal' => 'nullable|numeric|min:0',
+            'manual_iva' => 'nullable|numeric|min:0',
             'order_date' => 'required|date',
-            'ready_date' => 'required|date|after_or_equal:order_date',
-            'delivery_date' => 'required|date|after_or_equal:ready_date',
+            'ready_date' => 'nullable|date|after_or_equal:order_date',
+            'delivery_date' => 'nullable|date|after_or_equal:ready_date',
             'desired_date' => 'nullable|date',
             'status' => 'required|in:preparacao,concluido,entregue',
             'payment_status' => 'required|in:nao_pago,pago,parcial',
@@ -218,17 +236,28 @@ class OrderController extends Controller
                 $subtotal += $product->price * $item['quantity'];
             }
 
-            $iva = $subtotal * 0.23; // 23% IVA
+            $hasInvoice = !empty($validated['invoice']);
+            if ($hasInvoice && $request->filled('manual_subtotal')) {
+                $subtotal = (float) $validated['manual_subtotal'];
+            }
+            $iva = $hasInvoice ? ($subtotal * 0.22) : 0;
             $total = $subtotal + $iva;
+
+            // Compatibilidade com BD (delivery_date nao pode ficar null)
+            $readyDate = $validated['ready_date']
+                ?? ($order->ready_date ? $order->ready_date->toDateString() : $validated['order_date']);
+            $deliveryDate = $validated['status'] === 'entregue'
+                ? ($order->delivery_date ? $order->delivery_date->toDateString() : Carbon::today()->toDateString())
+                : $validated['order_date'];
 
             // Atualizar encomenda
             $order->update([
                 'client_id' => $validated['client_id'],
                 'trabalhador_id' => $validated['trabalhador_id'] ?? null,
-                'invoice' => $validated['invoice'] ?? null,  // ← ADICIONADO
+                'invoice' => $validated['invoice'] ?? null,
                 'order_date' => $validated['order_date'],
-                'ready_date' => $validated['ready_date'],
-                'delivery_date' => $validated['delivery_date'],
+                'ready_date' => $readyDate,
+                'delivery_date' => $deliveryDate,
                 'desired_date' => $validated['desired_date'],
                 'subtotal' => $subtotal,
                 'iva' => $iva,
@@ -241,7 +270,7 @@ class OrderController extends Controller
 
             // Remover itens antigos e criar novos
             $order->items()->delete();
-            
+
             foreach ($request->products as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -274,7 +303,7 @@ class OrderController extends Controller
 
             // Remover itens primeiro (foreign key)
             $order->items()->delete();
-            
+
             // Remover encomenda
             $order->delete();
 
@@ -290,4 +319,64 @@ class OrderController extends Controller
                 ->with('error', 'Erro ao eliminar encomenda: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Quick status/payment updates from the order detail page.
+     */
+    public function quickUpdate(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'status' => 'nullable|in:preparacao,concluido,entregue',
+            'payment_status' => 'nullable|in:nao_pago,pago,parcial',
+        ]);
+
+        if (!$request->filled('status') && !$request->filled('payment_status')) {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('error', 'Nenhuma alteração foi enviada.');
+        }
+
+        $updates = [
+            'trabalhador_id' => Auth::id(),
+        ];
+
+        if ($request->filled('status')) {
+            $updates['status'] = $validated['status'];
+
+            if ($validated['status'] === 'preparacao') {
+                $updates['ready_date'] = $order->ready_date
+                    ? $order->ready_date->toDateString()
+                    : ($order->order_date ? $order->order_date->toDateString() : Carbon::today()->toDateString());
+                $updates['delivery_date'] = $order->order_date
+                    ? $order->order_date->toDateString()
+                    : Carbon::today()->toDateString();
+            } elseif ($validated['status'] === 'concluido') {
+                $updates['ready_date'] = Carbon::today()->toDateString();
+                $updates['delivery_date'] = $order->order_date
+                    ? $order->order_date->toDateString()
+                    : Carbon::today()->toDateString();
+            } elseif ($validated['status'] === 'entregue') {
+                $updates['ready_date'] = $order->ready_date ? $order->ready_date->toDateString() : Carbon::today()->toDateString();
+                $updates['delivery_date'] = Carbon::today()->toDateString();
+            }
+        }
+
+        if ($request->filled('payment_status')) {
+            $updates['payment_status'] = $validated['payment_status'];
+        }
+
+        $order->update($updates);
+
+        return redirect()
+            ->route('orders.show', $order)
+            ->with('success', 'Estado atualizado com sucesso!');
+    }
 }
+
+
+
+
+
+
+
+
