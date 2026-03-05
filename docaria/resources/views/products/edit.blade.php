@@ -31,7 +31,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Preco (EUR)</label>
+                <label class="form-label">Preco (€)</label>
                 <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price', $product->price) }}" required>
             </div>
 

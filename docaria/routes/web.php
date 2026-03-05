@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     // Apenas admin: Estatísticas e Administração
     Route::middleware('admin')->group(function () {
         Route::get('/statistics', [EstatisticasController::class, 'index'])->name('statistics');
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->except(['show']);
     });
 
 

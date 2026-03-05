@@ -29,6 +29,7 @@ class EstatisticasController extends Controller
             'total_debt' => (float) (clone $ordersInPeriod)->whereIn('payment_status', ['nao_pago', 'parcial'])->sum('total'),
             'preparation_orders' => (clone $ordersInPeriod)->where('status', 'preparacao')->count(),
         ];
+        $kpis['total_billed'] = $kpis['total_paid'] + $kpis['total_debt'];
 
         // Donut: encomendas por estado
         $ordersByStatusRaw = (clone $ordersInPeriod)
@@ -86,7 +87,7 @@ class EstatisticasController extends Controller
 
         foreach ($monthsPeriod as $month) {
             $key = $month->format('Y-m');
-            $ordersByMonthLabels[] = ucfirst($month->translatedFormat('M/Y'));
+            $ordersByMonthLabels[] = ucfirst($month->locale('pt')->translatedFormat('M/Y'));
             $ordersByMonthData[] = (int) ($ordersByMonthMap[$key] ?? 0);
         }
 
@@ -237,6 +238,4 @@ class EstatisticasController extends Controller
         };
     }
 }
-
-
 

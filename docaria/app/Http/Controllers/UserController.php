@@ -52,22 +52,26 @@ class UserController extends Controller
 
 
     public function update(Request $request, $id){
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'role' => 'required|in:admin,vendedor,trabalhador',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|max:255',
+        ]);
 
-    $request->validate([
-    'name' => 'sometimes|required|string|max:50',
-    'role' => 'sometimes|required|string|max:50',
-    'email' => 'nullable|string|max:20',
-    'password' => 'nullable|string|max:20',
-    
-    ]);
+        $user = User::findorFail($id);
+        $user->name = $validated['name'];
+        $user->role = $validated['role'];
+        $user->email = $validated['email'];
 
-  $user = User::findorFail($id);
-  $user->name = $request->input('name');
-  $user->email = $request->input('email');
-  $user->password = $request->input('password');
-  $user->save();
+        // Só atualiza a password se o campo for preenchido.
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
 
-  return redirect()->route('users.index')->with('success', 'Utilizador actualizado com sucesso');
+        $user->save();
+
+        return redirect()->route('users.index')->with('success', 'Utilizador actualizado com sucesso');
     }
 
 
@@ -80,12 +84,4 @@ class UserController extends Controller
     return redirect()->route('users.index')->with('success', 'Utilizador eliminado com sucesso');
     }
 
-
-
-    public function show($id){
-        $user = User::findOrFail($id)
-        ->findOrFail($id);
-        return view('users.show', compact('user'));
-
-    }
 }

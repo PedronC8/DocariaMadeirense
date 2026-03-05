@@ -91,6 +91,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Nome</th>
                                     <th>Telefone</th>
                                     <th>NIF</th>
@@ -101,7 +102,8 @@
                             <tbody>
                                 @foreach($clients as $client)
                                     <tr>
-                                        <td><strong>{{ $client->name }}</strong></td>
+                                        <td>{{ $client->id }}</td>
+                                        <td>{{ $client->name }}</td>
                                         <td>{{ $client->contact ?? '---' }}</td>
                                         <td>{{ $client->nif ?? '---' }}</td>
                                         <td>
@@ -146,7 +148,7 @@
                         </table>
                     </div>
 
-                    <!-- Paginação igual às encomendas -->
+                    <!-- PaginaÃ§Ã£o igual Ã s encomendas -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div>
                             Mostrando {{ $clients->firstItem() }} a {{ $clients->lastItem() }} de {{ $clients->total() }} clientes

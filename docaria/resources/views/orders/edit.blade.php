@@ -126,7 +126,7 @@
         min-height: 33px !important;
         padding: 0.375rem 0.75rem;
     }
-    /* Garantir que o texto do cliente nÃƒÂ£o tapa o botÃƒÂ£o de limpar (x) */
+    /* Garantir que o texto do cliente nÃƒÆ’Ã‚Â£o tapa o botÃƒÆ’Ã‚Â£o de limpar (x) */
     .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         padding-right: 3rem !important;
         white-space: nowrap;
@@ -139,7 +139,7 @@
 @section('content')
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Editar Encomenda #{{ $order->id }}</strong></h3>
+        <h3><strong>Editar Encomenda {{ $order->id }}</strong></h3>
     </div>
     <div class="col-auto ms-auto text-end mt-n1">
         <a href="{{ route('orders.show', $order) }}" class="btn btn-info me-2">
@@ -156,7 +156,7 @@
     @method('PUT')
     
     <div class="row">
-        <!-- ÃƒÂrea Principal -->
+        <!-- Área Principal -->
         <div class="col-lg-8">
             <!-- Card: Cliente -->
             <div class="card mb-3">
@@ -196,14 +196,14 @@
                 </div>
             </div>
 
-            <!-- Card: Datas (4 campos visÃƒÂ­veis) -->
+            <!-- Card: Datas (4 campos visÃƒÆ’Ã‚Â­veis) -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Datas</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">Data Encomenda <span class="text-danger">*</span></label>
                             <input type="text" 
                                    id="orderDate" 
@@ -216,7 +216,16 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Data Desejada</label>
+                            <input type="text" 
+                                   id="desiredDate" 
+                                   class="form-control datepicker" 
+                                   value="{{ $order->desired_date ? $order->desired_date->format('d/m/Y') : '' }}"
+                                   autocomplete="off">
+                            <input type="hidden" name="desired_date" id="desiredDateHidden" value="{{ $order->desired_date ? $order->desired_date->format('Y-m-d') : '' }}">
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Pronto Em</label>
                             <input type="text" 
                                    id="readyDate" 
@@ -228,7 +237,9 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-3">
+                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
                             <label class="form-label">Data Entrega</label>
                             <input type="text" 
                                    id="deliveryDate" 
@@ -240,14 +251,12 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Data Desejada</label>
-                            <input type="text" 
-                                   id="desiredDate" 
-                                   class="form-control datepicker" 
-                                   value="{{ $order->desired_date ? $order->desired_date->format('d/m/Y') : '' }}"
-                                   autocomplete="off">
-                            <input type="hidden" name="desired_date" id="desiredDateHidden" value="{{ $order->desired_date ? $order->desired_date->format('Y-m-d') : '' }}">
+                        <div class="col-md-4">
+                            <label class="form-label">Pago Em</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ $order->payment_date ? $order->payment_date->format('d/m/Y') : 'N/A' }}"
+                                   readonly>
                         </div>
                     </div>
                 </div>
@@ -335,7 +344,7 @@
                     <h5 class="card-title mb-0">Informações Adicionais</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Trabalhador responsÃƒÂ¡vel HIDDEN - atualiza com ID do utilizador logado -->
+                    <!-- Trabalhador responsÃƒÆ’Ã‚Â¡vel HIDDEN - atualiza com ID do utilizador logado -->
                     <input type="hidden" name="trabalhador_id" value="{{ Auth::id() }}">
                     
                     <div class="mb-3">
@@ -358,7 +367,7 @@
                     
                     <div class="mb-0">
                         <label class="form-label">Notas</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Observações...">{{ old('notes', $order->notes) }}</textarea>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="ObservaÃ§Ãµes...">{{ old('notes', $order->notes) }}</textarea>
                     </div>
                 </div>
             </div>
@@ -377,7 +386,7 @@
                     </div>
 
                     <div id="orderItems">
-                        <!-- Items dinâmicos -->
+                        <!-- Items dinÃ¢micos -->
                     </div>
 
                                         <div id="pricingSection">
@@ -488,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDatePicker('desiredDate', 'desiredDateHidden');
 
     // ========================================
-    // 3. LÃƒâ€œGICA DA FATURA
+    // 3. LÃƒÆ’Ã¢â‚¬Å“GICA DA FATURA
     // ========================================
     const hasInvoiceCheckbox = document.getElementById('hasInvoice');
     const invoiceNumberInput = document.getElementById('invoiceNumber');
@@ -505,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ativar modo fatura
             invoiceNumberInput.classList.add('enabled');
             invoiceNumberInput.required = true;
-            invoiceNumberInput.disabled = false;  // AÇÃO IMPORTANTE: Ativar input
+            invoiceNumberInput.disabled = false;  // AÃ‡ÃƒO IMPORTANTE: Ativar input
             subtotalInput.readOnly = false;
             ivaInput.readOnly = true;
             ivaInput.disabled = true;
@@ -516,8 +525,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Desativar modo fatura
             invoiceNumberInput.classList.remove('enabled');
             invoiceNumberInput.required = false;
-            invoiceNumberInput.disabled = true;  // AÇÃO IMPORTANTE: Desativar input
-            invoiceNumberInput.value = '';       // AÇÃO LIMPAR valor
+            invoiceNumberInput.disabled = true;  // AÃ‡ÃƒO IMPORTANTE: Desativar input
+            invoiceNumberInput.value = '';       // AÃ‡ÃƒO LIMPAR valor
             subtotalInput.readOnly = true;
             ivaInput.readOnly = true;
             ivaInput.disabled = true;
@@ -724,13 +733,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemTotal = product.price * product.quantity;
             subtotal += itemTotal;
             
-            // SE TEM FATURA: Esconde valores (unitÃƒÂ¡rio e total)
+            // SE TEM FATURA: Esconde valores (unitÃƒÆ’Ã‚Â¡rio e total)
             if (hasInvoice) {
                 html += `
                     <div class="order-item-row">
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div class="flex-grow-1">
-                                <strong>${product.name}</strong> x ${product.quantity}
+                                ${product.name} x ${product.quantity}
                             </div>
                         </div>
                         <input type="hidden" name="products[${productId}][id]" value="${productId}">
@@ -743,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="order-item-row">
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div class="flex-grow-1">
-                                <strong>${product.name}</strong> x ${product.quantity}
+                                ${product.name} x ${product.quantity}
                             </div>
                             <div class="text-end">
                                 <strong>${itemTotal.toFixed(2).replace('.', ',')}${String.fromCharCode(8364)}</strong>
@@ -774,13 +783,13 @@ document.addEventListener('DOMContentLoaded', function() {
             subtotalInput.value = subtotal.toFixed(2);
         }
 
-        // IVA fica sempre automático (nunca manual).
+        // IVA fica sempre automÃ¡tico (nunca manual).
         ivaInput.value = computedIva.toFixed(2);
 
         updateTotalFromInputs();
     }
 
-    // Atualizar sumário inicial
+    // Atualizar sumÃ¡rio inicial
     updateSummary();
 
     // Feather Icons

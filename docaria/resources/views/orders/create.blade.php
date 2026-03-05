@@ -118,7 +118,7 @@
         min-height: 33px !important;
         padding: 0.375rem 0.75rem;
     }
-    /* Garantir que o texto do cliente não tapa o botão de limpar (x) */
+    /* Garantir que o texto do cliente nÃ£o tapa o botÃ£o de limpar (x) */
     .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         padding-right: 3rem !important;
         white-space: nowrap;
@@ -143,9 +143,9 @@
 <form id="orderForm" method="POST" action="{{ route('orders.store') }}">
     @csrf
     <div class="row">
-        <!-- Área Principal - Produtos e Informações -->
+        <!-- Ãrea Principal - Produtos e InformaÃ§Ãµes -->
         <div class="col-lg-8">
-            <!-- Card: Informações do Cliente -->
+            <!-- Card: InformaÃ§Ãµes do Cliente -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Cliente</h5>
@@ -281,15 +281,15 @@
             </div>
         </div>
 
-        <!-- Sidebar - Informações Adicionais + Resumo -->
+        <!-- Sidebar - InformaÃ§Ãµes Adicionais + Resumo -->
         <div class="col-lg-4">
-            <!-- Card: Informações Adicionais -->
+            <!-- Card: InformaÃ§Ãµes Adicionais -->
             <div class="card mb-3">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Informações Adicionais</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Trabalhador responsável HIDDEN - usa o ID do utilizador logado -->
+                    <!-- Trabalhador responsÃ¡vel HIDDEN - usa o ID do utilizador logado -->
                     <input type="hidden" name="trabalhador_id" value="{{ Auth::id() }}">
                     
                     <div class="mb-3">
@@ -336,7 +336,7 @@
 
                     <div class="d-flex justify-content-between mb-2" style="display: none !important;">
                         <span>Subtotal:</span>
-                        <strong id="subtotal">0,00€</strong>
+                        <strong id="subtotal">0,€</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2" style="display: none !important;">
                         <span>IVA:</span>
@@ -604,9 +604,9 @@ document.addEventListener('DOMContentLoaded', function() {
             orderItems.style.display = 'none';
             orderItems.innerHTML = '';
             submitBtn.disabled = true;
-            document.getElementById('subtotal').textContent = '0,00â‚¬';
-            document.getElementById('iva').textContent = '0,00â‚¬';
-            document.getElementById('total').textContent = '0,00â‚¬';
+            document.getElementById('subtotal').textContent = '0,00Ã¢â€šÂ¬';
+            document.getElementById('iva').textContent = '0,00Ã¢â€šÂ¬';
+            document.getElementById('total').textContent = '0,00Ã¢â€šÂ¬';
             return;
         }
 
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="order-item-row">
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <div class="flex-grow-1">
-                            <strong>${product.name}</strong> x ${product.quantity}
+                            ${product.name} x ${product.quantity}
                         </div>
                         <div class="text-end">
                             <strong>${itemTotal.toFixed(2).replace('.', ',')}€</strong>
@@ -654,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
 
 
 

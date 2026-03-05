@@ -47,13 +47,6 @@
                                         <td>{{ $user->role ?? '---' }}</td>
 
                                         <td class="text-end">
-
-                                            <a href="{{ route('users.show', $user) }}"
-                                               class="btn btn-sm btn-info"
-                                               title="Ver">
-                                                <i class="align-middle" data-feather="eye"></i>
-                                            </a>
-
                                             <a href="{{ route('users.edit', $user) }}"
                                                class="btn btn-sm btn-warning"
                                                title="Editar">

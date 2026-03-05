@@ -132,6 +132,9 @@ class OrderController extends Controller
             $deliveryDate = $validated['status'] === 'entregue'
                 ? Carbon::today()->toDateString()
                 : $validated['order_date'];
+            $paymentDate = ($validated['payment_status'] ?? null) === 'pago'
+                ? Carbon::today()->toDateString()
+                : null;
 
             // Criar encomenda
             $order = Order::create([
@@ -142,6 +145,7 @@ class OrderController extends Controller
                 'order_date' => $validated['order_date'],
                 'ready_date' => $readyDate,
                 'delivery_date' => $deliveryDate,
+                'payment_date' => $paymentDate,
                 'desired_date' => $validated['desired_date'],
                 'subtotal' => $subtotal,
                 'iva' => $iva,
@@ -193,7 +197,7 @@ class OrderController extends Controller
         $clients = Client::orderBy('name')->get();
         $products = Product::active()
             ->with('subcategory.category')
-            ->orderBy('name')
+            ->orderBy('id', 'asc')
             ->get();
         $users = User::where('role', 'trabalhador')->get();
         
@@ -249,6 +253,9 @@ class OrderController extends Controller
             $deliveryDate = $validated['status'] === 'entregue'
                 ? ($order->delivery_date ? $order->delivery_date->toDateString() : Carbon::today()->toDateString())
                 : $validated['order_date'];
+            $paymentDate = $validated['payment_status'] === 'pago'
+                ? ($order->payment_date ? $order->payment_date->toDateString() : Carbon::today()->toDateString())
+                : null;
 
             // Atualizar encomenda
             $order->update([
@@ -258,6 +265,7 @@ class OrderController extends Controller
                 'order_date' => $validated['order_date'],
                 'ready_date' => $readyDate,
                 'delivery_date' => $deliveryDate,
+                'payment_date' => $paymentDate,
                 'desired_date' => $validated['desired_date'],
                 'subtotal' => $subtotal,
                 'iva' => $iva,
@@ -363,6 +371,9 @@ class OrderController extends Controller
 
         if ($request->filled('payment_status')) {
             $updates['payment_status'] = $validated['payment_status'];
+            $updates['payment_date'] = $validated['payment_status'] === 'pago'
+                ? Carbon::today()->toDateString()
+                : null;
         }
 
         $order->update($updates);
@@ -372,8 +383,6 @@ class OrderController extends Controller
             ->with('success', 'Estado atualizado com sucesso!');
     }
 }
-
-
 
 
 

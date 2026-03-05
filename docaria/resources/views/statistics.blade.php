@@ -5,7 +5,7 @@
 @section('content')
 <div class="row">
     <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <h1 class="h3 mb-0"><strong style="color: #2f4f6c;">Estatisticas</strong></h1>
+        <h1 class="h3 mb-0"><strong style="color: #2f4f6c;">Estatísticas</strong></h1>
 
         <div class="btn-group" role="group" aria-label="Filtro de periodo">
             <a href="{{ route('statistics', ['period' => '7d']) }}" class="btn btn-sm {{ $period === '7d' ? 'btn-primary' : 'btn-outline-primary' }}">7 dias</a>
@@ -26,8 +26,8 @@
     <div class="col-xl-4 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title mb-2">Total de encomendas</h5>
-                <h3 class="mb-0" style="color: #222e3c;">{{ $kpis['total_orders'] }}</h3>
+                <h5 class="card-title mb-2">Valor Total Faturado</h5>
+                <h3 class="mb-0" style="color: #222e3c;">{{ number_format($kpis['total_billed'], 2, ',', '.') }} €</h3>
             </div>
         </div>
     </div>
@@ -35,8 +35,8 @@
     <div class="col-xl-4 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title mb-2">Total faturado (pago)</h5>
-                <h3 class="mb-0" style="color: #222e3c;">{{ number_format($kpis['total_paid'], 2, ',', '.') }} EUR</h3>
+                <h5 class="card-title mb-2">Valor Total Pago</h5>
+                <h3 class="mb-0" style="color: #222e3c;">{{ number_format($kpis['total_paid'], 2, ',', '.') }} €</h3>
             </div>
         </div>
     </div>
@@ -44,27 +44,14 @@
     <div class="col-xl-4 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title mb-2">Valor total em divida</h5>
-                <h3 class="mb-0" style="color: #222e3c;">{{ number_format($kpis['total_debt'], 2, ',', '.') }} EUR</h3>
+                <h5 class="card-title mb-2">Valor Total em Dí­vida</h5>
+                <h3 class="mb-0" style="color: #222e3c;">{{ number_format($kpis['total_debt'], 2, ',', '.') }} €</h3>
             </div>
         </div>
     </div>
 
 </div>
-<!-- Row 2: Line chart - faturacao por mes -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Faturacao por Mes</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="chartFaturacaoMonth" height="100"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Row 3: Donut charts -->
+<!-- Row 2: Donut charts -->
 <div class="row">
     <div class="col-lg-6">
         <div class="card">
@@ -89,12 +76,12 @@
     </div>
 </div>
 
-<!-- Row 4: Line chart -->
+<!-- Row 3: Line chart -->
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Encomendas por Mês</h5>
+                <h5 class="card-title mb-0">Encomendas e Faturacao por Mes</h5>
             </div>
             <div class="card-body">
                 <canvas id="chartOrdersMonth" height="100"></canvas>
@@ -103,7 +90,7 @@
     </div>
 </div>
 
-<!-- Row 5: Two bar charts -->
+<!-- Row 4: Two bar charts -->
 <div class="row">
     <div class="col-lg-6">
         <div class="card">
@@ -136,7 +123,7 @@
         </div>
     </div></div>
 
-<!-- Row 6: Tables -->
+<!-- Row 5: Tables -->
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -156,7 +143,7 @@
                         @forelse($overdueClients as $client)
                             <tr>
                                 <td>{{ $client->name }}</td>
-                                <td>{{ number_format((float) $client->total_debt, 2, ',', '.') }} EUR</td>
+                                <td>{{ number_format((float) $client->total_debt, 2, ',', '.') }} €</td>
                                 <td>{{ $client->pending_orders }}</td>
                             </tr>
                         @empty
@@ -192,7 +179,7 @@
                             @forelse($allClients as $client)
                                 <tr>
                                     <td>{{ $client->name }}</td>
-                                    <td class="text-end">{{ number_format((float) $client->total_faturado, 2, ',', '.') }} EUR</td>
+                                    <td class="text-end">{{ number_format((float) $client->total_faturado, 2, ',', '.') }} €</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -257,28 +244,6 @@
     const defaultLegend = {
         position: 'bottom'
     };
-
-
-    new Chart(document.getElementById('chartFaturacaoMonth'), {
-        type: 'line',
-        data: {
-            labels: faturacaoByMonth.labels,
-            datasets: [{
-                label: 'Faturacao (EUR)',
-                data: faturacaoByMonth.data,
-                borderColor: '#577c88',
-                backgroundColor: 'rgba(87,124,136,0.15)',
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
     new Chart(document.getElementById('chartOrdersStatus'), {
         type: 'doughnut',
         data: {
@@ -309,7 +274,17 @@
         }
     });
 
-    new Chart(document.getElementById('chartOrdersMonth'), {
+    function setLineEmphasis(chart, activeDatasetIndex = null) {
+        chart.data.datasets.forEach((dataset, index) => {
+            const isActive = activeDatasetIndex !== null && index === activeDatasetIndex;
+            dataset.borderWidth = isActive ? 4 : 2;
+            dataset.pointRadius = isActive ? 3 : 1;
+            dataset.pointHoverRadius = isActive ? 6 : 3;
+        });
+        chart.update('none');
+    }
+
+    const ordersMonthChart = new Chart(document.getElementById('chartOrdersMonth'), {
         type: 'line',
         data: {
             labels: ordersByMonth.labels,
@@ -318,14 +293,52 @@
                 data: ordersByMonth.data,
                 borderColor: '#2e4357',
                 backgroundColor: 'rgba(46,67,87,0.15)',
-                fill: true,
-                tension: 0.3
+                fill: false,
+                tension: 0.3,
+                yAxisID: 'yOrders',
+                borderWidth: 2,
+                pointRadius: 1,
+                pointHoverRadius: 6
+            }, {
+                label: 'Faturacao (€)',
+                data: faturacaoByMonth.data,
+                borderColor: '#577c88',
+                backgroundColor: 'rgba(87,124,136,0.15)',
+                fill: false,
+                tension: 0.3,
+                yAxisID: 'yRevenue',
+                borderWidth: 2,
+                pointRadius: 1,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
+            interaction: {
+                mode: 'nearest',
+                axis: 'xy',
+                intersect: false
+            },
+            onHover: (event, activeElements, chart) => {
+                if (activeElements.length > 0) {
+                    setLineEmphasis(chart, activeElements[0].datasetIndex);
+                    return;
+                }
+                setLineEmphasis(chart, null);
+            },
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
+                yOrders: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                },
+                yRevenue: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: { drawOnChartArea: false }
+                }
             }
         }
     });
@@ -334,7 +347,7 @@
         data: {
             labels: topClientsChart.labels,
             datasets: [{
-                label: 'Total faturado (EUR)',
+                label: 'Total faturado (€)',
                 data: topClientsChart.data,
                 backgroundColor: '#577c88'
             }]
@@ -366,6 +379,7 @@
         }
     });</script>
 @endpush
+
 
 
 

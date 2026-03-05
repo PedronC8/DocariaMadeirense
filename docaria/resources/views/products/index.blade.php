@@ -106,7 +106,7 @@
                                     <td>{{ $product->name }}</td>
                                     <td>{{ $product->subcategory->category->name ?? '-' }}</td>
                                     <td>{{ $product->subcategory->name ?? 'Sem subcategoria' }}</td>
-                                    <td>{{ number_format($product->price, 2) }} EUR</td>
+                                    <td>{{ number_format($product->price, 2) }} €</td>
                                     <td>
                                         @if($product->active)
                                             <span class="badge bg-success">Ativo</span>

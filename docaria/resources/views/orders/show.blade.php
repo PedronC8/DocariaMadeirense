@@ -5,7 +5,7 @@
 @section('content')
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>Encomenda #{{ $order->id }}</strong></h3>
+        <h3><strong>Encomenda {{ $order->id }}</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
@@ -54,17 +54,23 @@
                         <p class="mb-2 text-muted">Data Encomenda</p>
                         <p class="mb-0"><strong>{{ $order->order_date->format('d/m/Y') }}</strong></p>
                     </div>
+                    <div class="col-md-3 print-date-main">
+                        <p class="mb-2 text-muted">Data Desejada</p>
+                        <p class="mb-0"><strong>{{ $order->desired_date ? $order->desired_date->format('d/m/Y') : 'N/A' }}</strong></p>
+                    </div>
                     <div class="col-md-3 print-hide-date-extra">
                         <p class="mb-2 text-muted">Pronto Em</p>
-                        <p class="mb-0"><strong>{{ in_array($order->status, ['concluido', 'entregue']) && $order->ready_date ? $order->ready_date->format('d/m/Y') : 'N/A' }}</strong></p>
+                        <p class="mb-0"><strong>{{ in_array($order->status, ['concluído', 'entregue']) && $order->ready_date ? $order->ready_date->format('d/m/Y') : 'N/A' }}</strong></p>
                     </div>
+                </div>
+                <div class="row mt-3">
                     <div class="col-md-3 print-hide-date-extra">
                         <p class="mb-2 text-muted">Data Entrega</p>
                         <p class="mb-0"><strong>{{ $order->status === 'entregue' && $order->delivery_date ? $order->delivery_date->format('d/m/Y') : 'N/A' }}</strong></p>
                     </div>
-                    <div class="col-md-3 print-date-main">
-                        <p class="mb-2 text-muted">Data Desejada</p>
-                        <p class="mb-0"><strong>{{ $order->desired_date ? $order->desired_date->format('d/m/Y') : 'N/A' }}</strong></p>
+                    <div class="col-md-3 print-hide-date-extra">
+                        <p class="mb-2 text-muted">Pago Em</p>
+                        <p class="mb-0"><strong>{{ $order->payment_date ? $order->payment_date->format('d/m/Y') : 'N/A' }}</strong></p>
                     </div>
                 </div>
             </div>
@@ -91,7 +97,7 @@
                         <tbody>
                             @foreach($order->items as $item)
                                 <tr>
-                                    <td><strong>{{ $item->product->name }}</strong></td>
+                                    <td>{{ $item->product->name }}</td>
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     @if(!$order->invoice)
                                         <td class="text-end">{{ number_format($item->product->price, 2, ',', '.') }}€</td>
@@ -192,7 +198,7 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     @if($order->status == 'preparacao')
-                        <!-- PREPARAÇÃO ao Mostrar apenas botão Concluir -->
+                        <!-- PREPARAÇÂO ao Mostrar apenas botão Concluir -->
                         <form action="{{ route('orders.quick-update', $order) }}" method="POST">
                             @csrf
                             <input type="hidden" name="status" value="concluido">
@@ -274,7 +280,7 @@
                     @endif
 
                     @if($order->status == 'entregue' && $order->payment_status != 'pago')
-                        <!-- ENTREGUE mas NÃO PAGO ao Mostrar apenas botão Pago -->
+                        <!-- ENTREGUE mas NÃƒO PAGO ao Mostrar apenas botÃ£o Pago -->
                         <form action="{{ route('orders.quick-update', $order) }}" method="POST">
                             @csrf
                             <input type="hidden" name="payment_status" value="pago">
@@ -298,7 +304,7 @@
                         </form>
                     @endif
 
-                    <!-- BotÃµes sempre presentes (Imprimir e Eliminar) -->
+                    <!-- BotÃƒÂµes sempre presentes (Imprimir e Eliminar) -->
                     <div class="row g-2 mt-2">
                         <div class="col-6">
                             <button onclick="window.print()" class="btn btn-secondary w-100 btn-lg">
@@ -385,7 +391,7 @@
         flex: 0 0 50% !important;
     }
 
-    /* Esconder extras para manter impressão limpa */
+    /* Esconder extras para manter impressÃ£o limpa */
     .col-lg-8 > .card:nth-of-type(n+4) {
         display: none !important;
     }
@@ -402,7 +408,6 @@
 }
 </style>
 @endpush
-
 
 
 

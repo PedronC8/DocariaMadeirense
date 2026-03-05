@@ -199,7 +199,7 @@
                             <tbody>
                                 @foreach($orders as $order)
                                     <tr>
-                                        <td><strong>#{{ $order->id }}</strong></td>
+                                        <td>{{ $order->id }}</td>
                                         <td>{{ $order->invoice ?? 'N/A' }}</td>
                                         <td class="client-cell"
                                             data-bs-toggle="tooltip"
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. INICIALIZAR FLATPICKR (DATAS EM PORTUGUÃŠS)
     // ========================================
     
-    // Data InÃ­cio
+    // Data Iní­cio
     const dateFromPicker = flatpickr("#dateFrom", {
         dateFormat: "d/m/Y",      // Formato visual: dd/mm/yyyy
         altInput: false,

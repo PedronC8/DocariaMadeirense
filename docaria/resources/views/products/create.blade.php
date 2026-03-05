@@ -30,7 +30,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="price" class="form-label">Preco (EUR)</label>
+                <label for="price" class="form-label">Preco (€)</label>
                 <input type="number" step="0.01" name="price" id="price" class="form-control" value="{{ old('price') }}" required>
             </div>
 

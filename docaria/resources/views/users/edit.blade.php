@@ -40,7 +40,7 @@
 
 	<div class="mb-3">
         <label for="email" class="form-label">Email do utilizador</label>
-        <input  name="email" type="text" class="form-control" id="email" value="{{ $user->email }}">
+        <input name="email" type="email" class="form-control" id="email" value="{{ old('email', $user->email) }}" required>
         @error('email')
             <p class="text-danger">Erro no email do utilizador</p>
         @enderror
@@ -48,7 +48,8 @@
 
 	<div class="mb-3">
         <label for="password" class="form-label">Password do utilizador</label>
-        <input  name="password" type="password" class="form-control" id="password" value="{{ $user->password }}">
+        <input name="password" type="password" class="form-control" id="password" value="">
+        <small class="text-muted">Deixe em branco para manter a password atual.</small>
         @error('password')
             <p class="text-danger">Erro na password do utilizador</p>
         @enderror
