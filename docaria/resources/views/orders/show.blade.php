@@ -55,12 +55,12 @@
                         <p class="mb-0"><strong>{{ $order->order_date->format('d/m/Y') }}</strong></p>
                     </div>
                     <div class="col-md-3 print-date-main">
-                        <p class="mb-2 text-muted">Data Desejada</p>
+                        <p class="mb-2 text-muted text-nowrap">Data Entrega Desejada</p>
                         <p class="mb-0"><strong>{{ $order->desired_date ? $order->desired_date->format('d/m/Y') : 'N/A' }}</strong></p>
                     </div>
-                    <div class="col-md-3 print-hide-date-extra">
+                    <div class="col-md-3 print-hide-date-extra ps-md-5">
                         <p class="mb-2 text-muted">Pronto Em</p>
-                        <p class="mb-0"><strong>{{ in_array($order->status, ['concluído', 'entregue']) && $order->ready_date ? $order->ready_date->format('d/m/Y') : 'N/A' }}</strong></p>
+                        <p class="mb-0"><strong>{{ in_array($order->status, ['concluido', 'entregue']) && $order->ready_date ? $order->ready_date->format('d/m/Y') : 'N/A' }}</strong></p>
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -97,7 +97,24 @@
                         <tbody>
                             @foreach($order->items as $item)
                                 <tr>
-                                    <td>{{ $item->product->name }}</td>
+                                    <td>
+                                        <form action="{{ route('orders.items.check', ['order' => $order, 'item' => $item]) }}" method="POST" class="d-flex align-items-center gap-2 mb-0">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="is_checked" value="0">
+                                            <input
+                                                type="checkbox"
+                                                name="is_checked"
+                                                value="1"
+                                                class="form-check-input mt-0 order-item-checkbox"
+                                                onchange="this.form.submit()"
+                                                {{ $item->is_checked ? 'checked' : '' }}
+                                                aria-label="Marcar produto {{ $item->product->name }} como concluido">
+                                            <span class="order-item-name {{ $item->is_checked ? 'order-item-checked' : '' }}">
+                                                {{ $item->product->name }}
+                                            </span>
+                                        </form>
+                                    </td>
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     @if(!$order->invoice)
                                         <td class="text-end">{{ number_format($item->product->price, 2, ',', '.') }}€</td>
@@ -332,11 +349,24 @@
 
 @push('styles')
 <style>
+.order-item-name {
+    transition: color 0.2s ease;
+}
+
+.order-item-checked {
+    color: #6c757d;
+    text-decoration: line-through;
+}
+
 @media print {
     .sidebar,
     .navbar,
     .btn,
     .card-header {
+        display: none !important;
+    }
+
+    .order-item-checkbox {
         display: none !important;
     }
 
@@ -408,11 +438,5 @@
 }
 </style>
 @endpush
-
-
-
-
-
-
 
 

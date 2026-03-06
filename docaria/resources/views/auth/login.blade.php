@@ -37,8 +37,8 @@
                                             </div>
                                         @endif
                                         <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input class="form-control form-control-lg" type="email" name="email" value="{{ old('email') }}" placeholder="Digite o seu email" required>
+                                            <label class="form-label">Nome de Utilizador</label>
+                                            <input class="form-control form-control-lg" type="text" name="username" value="{{ old('username') }}" placeholder="Digite o seu nome de utilizador" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Palavra-passe</label>

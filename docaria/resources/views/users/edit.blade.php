@@ -39,10 +39,10 @@
     </div>
 
 	<div class="mb-3">
-        <label for="email" class="form-label">Email do utilizador</label>
-        <input name="email" type="email" class="form-control" id="email" value="{{ old('email', $user->email) }}" required>
-        @error('email')
-            <p class="text-danger">Erro no email do utilizador</p>
+        <label for="username" class="form-label">Nome de utilizador</label>
+        <input name="username" type="text" class="form-control" id="username" value="{{ old('username', $user->username) }}" required>
+        @error('username')
+            <p class="text-danger">Erro no nome de utilizador</p>
         @enderror
     </div>
 

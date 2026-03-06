@@ -351,7 +351,7 @@
                         <label class="form-label">Estado <span class="text-danger">*</span></label>
                         <select name="status" class="form-select" required>
                             <option value="preparacao" {{ $order->status == 'preparacao' ? 'selected' : '' }}>Em Preparação</option>
-                            <option value="concluido" {{ $order->status == 'concluido' ? 'selected' : '' }}>Conclusão</option>
+                            <option value="concluido" {{ $order->status == 'concluido' ? 'selected' : '' }}>Concluído</option>
                             <option value="entregue" {{ $order->status == 'entregue' ? 'selected' : '' }}>Entregue</option>
                         </select>
                     </div>
@@ -367,7 +367,7 @@
                     
                     <div class="mb-0">
                         <label class="form-label">Notas</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="ObservaÃ§Ãµes...">{{ old('notes', $order->notes) }}</textarea>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Observações...">{{ old('notes', $order->notes) }}</textarea>
                     </div>
                 </div>
             </div>

@@ -48,6 +48,10 @@ class ProductController extends Controller
             $this->productMessages()
         );
 
+        if (empty($validated['label'])) {
+            $validated['label'] = $validated['name'];
+        }
+
         if ($request->hasFile('image')) {
             $validated['imageUrl'] = $this->storeProductImage($request->file('image'));
         }
@@ -90,6 +94,10 @@ class ProductController extends Controller
             $this->productRules(),
             $this->productMessages()
         );
+
+        if (empty($validated['label'])) {
+            $validated['label'] = $validated['name'];
+        }
 
         if ($request->hasFile('image')) {
             $this->deleteLocalProductImage($product->imageUrl);

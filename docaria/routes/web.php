@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Encomendas - CRUD Completo
     Route::post('orders/{order}/quick-update', [OrderController::class, 'quickUpdate'])->name('orders.quick-update');
+    Route::patch('orders/{order}/items/{item}/check', [OrderController::class, 'toggleItemCheck'])->name('orders.items.check');
     Route::resource('orders', OrderController::class);
 
     // Produtos (assumindo que vais criar depois)

@@ -16,19 +16,19 @@ class LoginController extends Controller
     public function store(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string', 'max:255'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
             return redirect()->intended(route('orders.index'));
         }
 
         return back()->withErrors([
-            'email' => 'Credenciais inválidas.',
-        ])->onlyInput('email');
+            'username' => 'Credenciais invalidas.',
+        ])->onlyInput('username');
     }
 
     public function destroy(Request $request)

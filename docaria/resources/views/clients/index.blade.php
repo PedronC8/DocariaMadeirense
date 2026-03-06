@@ -94,8 +94,7 @@
                                     <th>ID</th>
                                     <th>Nome</th>
                                     <th>Telefone</th>
-                                    <th>NIF</th>
-                                    <th>Morada</th>
+                                    <th>ID Faturação</th>
                                     <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
@@ -105,12 +104,7 @@
                                         <td>{{ $client->id }}</td>
                                         <td>{{ $client->name }}</td>
                                         <td>{{ $client->contact ?? '---' }}</td>
-                                        <td>{{ $client->nif ?? '---' }}</td>
-                                        <td>
-                                            {{ $client->address 
-                                                ? Str::limit($client->address, 20) 
-                                                : '---' }}
-                                        </td>
+                                        <td>{{ $client->idFaturacao ?? '---' }}</td>
                                         <td class="text-end">
 
                                             <!-- Ver Detalhes -->

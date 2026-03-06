@@ -1,60 +1,68 @@
 @extends('layouts.app')
-@section('content')
 
+@section('title', 'Detalhes do Cliente - A Docaria')
+
+@section('content')
 <div class="row mb-2 mb-xl-3">
     <div class="col-auto d-none d-sm-block">
-        <h3><strong>{{$client->name}}</strong></h3>
+        <h3><strong style="color: #2f4f6c;">Detalhes do Cliente</strong></h3>
     </div>
 
     <div class="col-auto ms-auto text-end mt-n1">
-        <a href="{{ route('clients.index') }}" class="btn btn-primary">
-             Voltar 
+        <a href="{{ route('clients.index') }}" class="btn btn-info">
+            <i class="align-middle" data-feather="arrow-left"></i> Voltar
         </a>
     </div>
 </div>
 
-<div class="card">
-  <div class="card-body p-0">
-    <table class="table table-borderless table-sm mb-0 " >
-  <thead style="background:#e2e8f0;color:#0f172a;border-bottom:2px solid #cbd5e1;">
-    <tr>
-      <th>Nome</th>
-		<th>Telefone</th>
-		<th>Nif</th>
-		<th>Morada</th>
-    <th>Ações</th>
-      
-    </tr>
-  </thead>
-  <tbody>
-  
-
- 
-      <tr >
-        <td>{{ $client->name }}</td>
-        <td>{{ $client->nif ? $client->nif : '---' }}</td>
-        <td>{{ $client->contact ? $client->contact : '---' }}</td>
-        <td>{{ $client->address ? $client->address : '---' }}</td>
-        
-        
-        <td>
-          <a href="{{ route('clients.edit', $client->id) }}" class="btn btn-warning "><i class="align-middle" data-feather="edit"></i></a>
-          <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="d-inline">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger"><i class="align-middle" data-feather="trash-2"></i></button>
-          </form>
-        </td>
-        
-      </tr>
-  
-  </tbody>
-
-
-  </div>
-
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ $client->name }}</h5>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('clients.edit', $client) }}" class="btn btn-sm btn-warning" title="Editar">
+                        <i class="align-middle" data-feather="edit"></i>
+                    </a>
+                    <form action="{{ route('clients.destroy', $client) }}"
+                          method="POST"
+                          class="d-inline"
+                          onsubmit="return confirm('Tem a certeza que deseja eliminar este cliente?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="align-middle" data-feather="trash-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>NIF</th>
+                                <th>IdFaturacao</th>
+                                <th>Morada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ $client->id }}</td>
+                                <td>{{ $client->name ?? '---' }}</td>
+                                <td>{{ $client->contact ?? '---' }}</td>
+                                <td>{{ $client->nif ?? '---' }}</td>
+                                <td>{{ $client->idFaturacao ?? '---' }}</td>
+                                <td>{{ $client->address ?? '---' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
-</table>
 @endsection

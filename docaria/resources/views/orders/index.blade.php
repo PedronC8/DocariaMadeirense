@@ -189,7 +189,7 @@
                                     <th>Fatura</th>
                                     <th>Cliente</th>
                                     <th>Data Encomenda</th>
-                                    <th>Data Entrega</th>
+                                    <th>Data Para Entrega</th>
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Pagamento</th>

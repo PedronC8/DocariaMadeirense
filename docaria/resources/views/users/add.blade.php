@@ -16,10 +16,10 @@
 <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
     @csrf
     @method('POST')
-      <div class="mb-3">
+    <div class="mb-3">
         <label for="name" class="form-label">Nome do utilizador</label>
-        <input required name="name" type="text" class="form-control" id="username" >
-        @error('username')
+        <input required name="name" type="text" class="form-control" id="name" >
+        @error('name')
             <p class="text-danger">Erro no nome do utilizador</p>
         @enderror
     </div>
@@ -38,10 +38,10 @@
     </div>
 
 	<div class="mb-3">
-        <label for="email" class="form-label">Email do utilizador</label>
-        <input  name="email" type="email" class="form-control" id="email" value="{{ old('email') }}" required>
-        @error('email')
-            <p class="text-danger">Erro no email do utilizador</p>
+        <label for="username" class="form-label">Nome de utilizador</label>
+        <input name="username" type="text" class="form-control" id="username" value="{{ old('username') }}" required>
+        @error('username')
+            <p class="text-danger">Erro no nome de utilizador</p>
         @enderror
     </div>
 

@@ -33,7 +33,7 @@
                             <thead>
                                 <tr>
                                     <th>Nome</th>
-                                    <th>Email</th>
+                                    <th>Nome de Utilizador</th>
                                     <th>Tipo de utilizador</th>
                                     <th class="text-end">Ações</th>
                                 </tr>
@@ -43,7 +43,7 @@
                                 @foreach($users as $user)
                                     <tr>
                                         <td><strong>{{ $user->name }}</strong></td>
-                                        <td>{{ $user->email }}</td>
+                                        <td>{{ $user->username }}</td>
                                         <td>{{ $user->role ?? '---' }}</td>
 
                                         <td class="text-end">

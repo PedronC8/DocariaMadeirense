@@ -382,8 +382,27 @@ class OrderController extends Controller
             ->route('orders.show', $order)
             ->with('success', 'Estado atualizado com sucesso!');
     }
-}
 
+    /**
+     * Mark/unmark an order item as checked from the order detail page.
+     */
+    public function toggleItemCheck(Request $request, Order $order, OrderItem $item)
+    {
+        if ((int) $item->order_id !== (int) $order->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'is_checked' => 'required|boolean',
+        ]);
+
+        $item->update([
+            'is_checked' => (bool) $validated['is_checked'],
+        ]);
+
+        return redirect()->route('orders.show', $order);
+    }
+}
 
 
 

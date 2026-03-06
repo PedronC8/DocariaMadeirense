@@ -19,15 +19,23 @@
     @method('POST')
       <div class="mb-3">
         <label for="name" class="form-label">Nome do cliente</label>
-        <input required name="name" type="text" class="form-control" id="username" >
-        @error('username')
+        <input required name="name" type="text" class="form-control" id="name" value="{{ old('name') }}">
+        @error('name')
             <p class="text-danger">Erro no nome do cliente</p>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label for="idFaturacao" class="form-label">ID Faturação</label>
+        <input name="idFaturacao" type="text" class="form-control" id="idFaturacao" value="{{ old('idFaturacao') }}">
+        @error('idFaturacao')
+            <p class="text-danger">Erro no ID Faturação</p>
         @enderror
     </div>
 
 	<div class="mb-3">
         <label for="nif" class="form-label">Nif do cliente</label>
-        <input  name="nif" type="text" class="form-control" id="nif" >
+        <input  name="nif" type="text" class="form-control" id="nif" value="{{ old('nif') }}">
         @error('nif')
             <p class="text-danger">Erro no nif do cliente</p>
         @enderror
@@ -35,7 +43,7 @@
 
 	<div class="mb-3">
         <label for="contact" class="form-label">Contacto do cliente</label>
-        <input  name="contact" type="text" class="form-control" id="contact" >
+        <input  name="contact" type="text" class="form-control" id="contact" value="{{ old('contact') }}">
         @error('contact')
             <p class="text-danger">Erro no contacto do cliente</p>
         @enderror
@@ -43,7 +51,7 @@
 
 	<div class="mb-3">
         <label for="address" class="form-label">Morada do cliente</label>
-        <input  name="address" type="text" class="form-control" id="address" >
+        <input  name="address" type="text" class="form-control" id="address" value="{{ old('address') }}">
         @error('address')
             <p class="text-danger">Erro na morada do cliente</p>
         @enderror

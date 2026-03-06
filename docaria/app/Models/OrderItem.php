@@ -15,10 +15,12 @@ class OrderItem extends Model
         'order_id',
         'product_id',
         'quantity',
+        'is_checked',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
+        'is_checked' => 'boolean',
     ];
 
     // Relacionamentos

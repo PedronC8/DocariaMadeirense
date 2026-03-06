@@ -26,6 +26,7 @@ class ClientController extends Controller
     public function store(Request $request){
 $request->validate([
     'name' => 'required|string|max:50',
+    'idFaturacao' => 'nullable|string|max:50',
     'nif' => 'nullable|string|max:20',
     'contact' => 'nullable|string|max:20',
     'address' => 'nullable|string|max:255',
@@ -33,6 +34,7 @@ $request->validate([
 
 DB::table('clients')->insert([
     'name' => $request->input('name'),
+    'idFaturacao' => $request->input('idFaturacao'),
     'nif' => $request->input('nif'),
     'contact' => $request->input('contact'),
     'address' => $request->input('address')

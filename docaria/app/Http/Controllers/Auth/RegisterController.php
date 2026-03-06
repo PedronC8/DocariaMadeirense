@@ -18,17 +18,16 @@ class RegisterController extends Controller
         $data = $request->validate(
             [
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'username' => ['required', 'string', 'max:255', 'unique:users,username'],
                 'password' => ['required', 'string', 'min:8'],
             ],
             [
-                'name.required' => 'O nome é obrigatório.',
-                'name.max' => 'O nome não pode ter mais de 255 caracteres.',
-                'email.required' => 'O email é obrigatório.',
-                'email.email' => 'O email deve ser válido.',
-                'email.max' => 'O email não pode ter mais de 255 caracteres.',
-                'email.unique' => 'Este email já está registado.',
-                'password.required' => 'A palavra-passe é obrigatória.',
+                'name.required' => 'O nome e obrigatorio.',
+                'name.max' => 'O nome nao pode ter mais de 255 caracteres.',
+                'username.required' => 'O nome de utilizador e obrigatorio.',
+                'username.max' => 'O nome de utilizador nao pode ter mais de 255 caracteres.',
+                'username.unique' => 'Este nome de utilizador ja esta registado.',
+                'password.required' => 'A palavra-passe e obrigatoria.',
                 'password.min' => 'A palavra-passe deve ter pelo menos 8 caracteres.',
             ]
         );
@@ -37,6 +36,6 @@ class RegisterController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('status', 'Conta criada com sucesso. Faça login.');
+            ->with('status', 'Conta criada com sucesso. Faca login.');
     }
 }
